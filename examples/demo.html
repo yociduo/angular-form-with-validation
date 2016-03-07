@@ -16,7 +16,14 @@
 </head>
 <body ng-controller="DemoCtrl">
     <h3>Angular form with validation</h3>
-    <form-area template-url="../dist/tpls/area.html" class="form-horizontal">
+    <form-area class="form-horizontal"
+               form-model="formModel"
+               form-validation="formValidation"
+               form-control-class="col-md-6"
+               form-control-label-class="col-md-3">
+        <form-input></form-input>
+        <form-input></form-input>
+        <form-input template-url="../dist/tpls/input.html"></form-input>
     </form-area>
 
     <script type="text/javascript" src="../src/jquery/jquery.min.js"></script>
