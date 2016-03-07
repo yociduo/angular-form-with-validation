@@ -1,9 +1,9 @@
 'use strict';
 
 var app = angular.module('demo', [
-    'angular.form'
+    'angular-form-with-validation'
 ]);
 
-app.controller('DemoCtrl', function () {
+app.controller('DemoCtrl', function ($scope) {
 
 });
