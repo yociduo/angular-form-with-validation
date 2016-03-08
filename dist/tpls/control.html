@@ -1,6 +1,7 @@
 <div class="form-group" ng-class="ctrl.formValidation[controlName] | formGroupValidation">
     <label class="control-label" ng-class="controlLabelClass">{{ controlLabel }}</label>
     <div ng-class="controlClass">
-        <form-input ng-if="controlInput" template-url="../dist/tpls/input.html"></form-input>
+        <form-input ng-if="controlInput"></form-input>
+        <form-static ng-if="controlStatic"></form-static>
     </div>
 </div>

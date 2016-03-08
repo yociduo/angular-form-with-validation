@@ -65,7 +65,8 @@ angular.module('angular.form', [])
 });
 
 angular.module('angular.form.control', [
-    'angular.form.input'
+    'angular.form.control.static',
+    'angular.form.control.input'
 ])
 .directive('formControl', function () {
     return {
@@ -88,14 +89,29 @@ angular.module('angular.form.control', [
 
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {
-                    case 'input': $scope.controlInput = true;
+                    case 'static': $scope.controlStatic = true; break;
+                    case 'input': $scope.controlInput = true; break;
                 }
             }
         }
     };
 });
 
-angular.module('angular.form.input', [])
+angular.module('angular.form.control.static', [])
+.directive('formStatic', function () {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || 'fwv/template/form/static.html';
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+});
+
+angular.module('angular.form.control.input', [])
 .directive('formInput', function () {
     return {
         require: '^formControl',
@@ -112,6 +128,7 @@ angular.module('angular.form.input', [])
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
+    'fwv/template/form/static.html',
     'fwv/template/form/input.html'
 ]);
 
@@ -127,9 +144,16 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\">\n' +
         '   <label class=\"control-label\" ng-class=\"controlLabelClass\">{{ controlLabel }}</label>\n' +
         '   <div ng-class=\"controlClass\">\n' +
-        '       <form-input ng-if=\"controlInput\"></form-input>\n' + 
+        '       <form-static ng-if=\"controlStatic\"></form-static>\n' +
+        '       <form-input ng-if=\"controlInput\"></form-input>\n' +
         '   </div>\n' +
         '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/static.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/static.html',
+        '<p class=\"form-control-static\"> {{ ctrl.formModel[controlName] }} </p>\n' +
         '');
 }]);
 
