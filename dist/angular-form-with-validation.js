@@ -76,7 +76,11 @@ angular.module('angular.form.control', [
             return attrs.templateUrl || 'fwv/template/form/control.html';
         },
         replace: true,
-        scope: {},
+        scope: {
+            controlRequired: '@',
+            controlMinlength: '@',
+            controlMaxlength: '@'
+        },
         transclude: true,
         controller: function () { },
         link: function ($scope, $element, $attrs, $ctrl) {
@@ -86,6 +90,7 @@ angular.module('angular.form.control', [
             $scope.controlLabel = angular.isDefined($attrs.controlLabel) ? $attrs.controlLabel : 'Untitled';
             $scope.controlClass = angular.isDefined($attrs.controlClass) ? $attrs.controlClass : ctrl.formControlClass;
             $scope.controlLabelClass = angular.isDefined($attrs.controlLabelClass) ? $attrs.controlLabelClass : ctrl.formControlLabelClass;
+            $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : undefined;
 
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {
@@ -159,6 +164,11 @@ angular.module('fwv/template/form/static.html', []).run(['$templateCache', funct
 
 angular.module('fwv/template/form/input.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/input.html',
-        '<input type=\"text\" name=\"{{ controlName }}\" class=\"form-control\" ng-model=\"ctrl.formModel[controlName]\" />\n' +
+        '<input type=\"text\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
+        '       ng-model=\"ctrl.formModel[controlName]\"\n' +
+        '       ng-required=\"controlRequired\"\n' +
+        '       ng-pattern=\"controlPattern\"\n' +
+        '       ng-minlength=\"controlMinlength\"\n' +
+        '       ng-maxlength=\"controlMaxlength\" />\n' +
         '');
 }]);
