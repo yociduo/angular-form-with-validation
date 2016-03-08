@@ -20,11 +20,18 @@
                form-model="formModel"
                form-validation="formValidation"
                form-control-class="col-md-6"
-               form-control-label-class="col-md-3"
-               template-url="../dist/tpls/area.html">
-        <form-input></form-input>
-        <form-input></form-input>
-        <form-input template-url="../dist/tpls/input.html"></form-input>
+               form-control-label-class="col-md-3">
+        <div class="form-body">
+            <form-control control-type="input"></form-control>
+            <form-control control-type="input"></form-control>
+            <form-control control-type="input"></form-control>
+        </div>
+        <div class="form-actions">
+            <div class="col-md-offset-3 col-md-9">
+                <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+                <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
+            </div>
+        </div>
     </form-area>
 
     <script type="text/javascript" src="../src/jquery/jquery.min.js"></script>

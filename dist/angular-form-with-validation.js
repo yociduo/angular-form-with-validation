@@ -55,8 +55,8 @@ angular.module('angular.form', [])
             formValidation: '=',
             formModel: '='
         },
-        transclude: true,
         controller: 'AngularFormController',
+        transclude: true,
         link: function ($scope, $element, $attrs) {
             $scope.formModel = angular.isDefined($scope.formModel) ? $scope.formModel : new Object();
             $scope.formValidation = $scope.form;
@@ -66,20 +66,18 @@ angular.module('angular.form', [])
 
 angular.module('angular.form.control', [
     'angular.form.input'
-]);
-
-angular.module('angular.form.input', [])
-.directive('formInput', function () {
+])
+.directive('formControl', function () {
     return {
         require: '^formArea',
-        restric: 'E',
+        restrict: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || 'fwv/template/form/input.html';
+            return attrs.templateUrl || 'fwv/template/form/control.html';
         },
         replace: true,
         scope: {},
-        controller: function () { },
         transclude: true,
+        controller: function () { },
         link: function ($scope, $element, $attrs, $ctrl) {
             var ctrl = $scope.ctrl = $ctrl;
             $scope.controlName = angular.isDefined($attrs.controlName) && $attrs.controlName.length > 0 ?
@@ -87,12 +85,33 @@ angular.module('angular.form.input', [])
             $scope.controlLabel = angular.isDefined($attrs.controlLabel) ? $attrs.controlLabel : 'Untitled';
             $scope.controlClass = angular.isDefined($attrs.controlClass) ? $attrs.controlClass : ctrl.formControlClass;
             $scope.controlLabelClass = angular.isDefined($attrs.controlLabelClass) ? $attrs.controlLabelClass : ctrl.formControlLabelClass;
+
+            if (angular.isDefined($attrs.controlType)) {
+                switch ($attrs.controlType) {
+                    case 'input': $scope.controlInput = true;
+                }
+            }
         }
+    };
+});
+
+angular.module('angular.form.input', [])
+.directive('formInput', function () {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || 'fwv/template/form/input.html';
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
     };
 });
 
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
+    'fwv/template/form/control.html',
     'fwv/template/form/input.html'
 ]);
 
@@ -103,13 +122,19 @@ angular.module('fwv/template/form/area.html', []).run(['$templateCache', functio
         '');
 }]);
 
+angular.module('fwv/template/form/control.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/control.html',
+        '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\">\n' +
+        '   <label class=\"control-label\" ng-class=\"controlLabelClass\">{{ controlLabel }}</label>\n' +
+        '   <div ng-class=\"controlClass\">\n' +
+        '       <form-input ng-if=\"controlInput\"></form-input>\n' + 
+        '   </div>\n' +
+        '</div>\n' +
+        '');
+}]);
+
 angular.module('fwv/template/form/input.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/input.html',
-        '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\">\n' +
-        '    <label class=\"control-label\" ng-class=\"controlLabelClass\">{{ controlLabel }}</label>\n' +
-        '    <div ng-class=\"controlClass\">\n' +
-        '        <input type=\"text\" name=\"{{ controlName }}\" class=\"form-control\" ng-model=\"ctrl.formModel[controlName]\" />\n' +
-        '    </div>\n' +
-        '</div>\n' +
+        '<input type=\"text\" name=\"{{ controlName }}\" class=\"form-control\" ng-model=\"ctrl.formModel[controlName]\" />\n' +
         '');
 }]);
