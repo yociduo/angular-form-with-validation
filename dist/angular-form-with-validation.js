@@ -26,7 +26,49 @@ angular.module('angular.form.filter', [])
         }
         return '';
     };
-}]);
+}])
+.filter('formShowMessage', function () {
+    return function (input) {
+        if (input) {
+            if (input.$error && (input.$touched || (!input.$pristine && input.$untouched))) {
+                return !$.isEmptyObject(input.$error);
+            }
+        }
+        return false;
+    };
+})
+.filter('formErrorMessage', function () {
+    return function (input) {
+        if (input) {
+            if (input.$error && (input.$touched || (!input.$pristine && input.$untouched))) {
+                if (input.$error['required']) {
+                    return 'This field is required.';
+                } else if (input.$error['maxlength']) {
+                    return 'This field is too long.';
+                } else if (input.$error['minlength']) {
+                    return 'This field is too short.';
+                } else if (input.$error['number-only']) {
+                    return 'This field is number only';
+                } else if (input.$error['number-small']) {
+                    return 'This number is too small';
+                } else if (input.$error['number-big']) {
+                    return 'This number is too big';
+                } else if (input.$error['date-format']) {
+                    return 'This field must be a date';
+                } else if (input.$error['date-from-small-to']) {
+                    return 'Date from must be smaller than date to.';
+                } else if (input.$error['date-to-large-from']) {
+                    return 'Date to must be larger than date from.';
+                } else if (input.$error['pattern']) {
+                    return 'This field\'s format is wrong.';
+                } else if (input.$error['uploading-file']) {
+                    return 'Upload this file now.';
+                }
+            }
+        }
+        return '';
+    };
+});
 
 angular.module('angular.form', [])
 .controller('AngularFormController', ['$scope', '$attrs', 'angularFormConfig', function ($scope, $attrs, angularFormConfig) {
@@ -91,6 +133,7 @@ angular.module('angular.form.control', [
             $scope.controlClass = angular.isDefined($attrs.controlClass) ? $attrs.controlClass : ctrl.formControlClass;
             $scope.controlLabelClass = angular.isDefined($attrs.controlLabelClass) ? $attrs.controlLabelClass : ctrl.formControlLabelClass;
             $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : undefined;
+            $scope.controlHelp = angular.isDefined($attrs.controlHelp) ? $attrs.controlHelp : null;
 
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {
@@ -151,6 +194,9 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '   <div ng-class=\"controlClass\">\n' +
         '       <form-static ng-if=\"controlStatic\"></form-static>\n' +
         '       <form-input ng-if=\"controlInput\"></form-input>\n' +
+        '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
+        '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
+        '       </span>\n' +
         '   </div>\n' +
         '</div>\n' +
         '');

@@ -3,5 +3,8 @@
     <div ng-class="controlClass">
         <form-input ng-if="controlInput"></form-input>
         <form-static ng-if="controlStatic"></form-static>
+        <span class="help-block" ng-if="controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)">
+            {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}
+        </span>
     </div>
 </div>
