@@ -12,6 +12,8 @@ angular.module('angular.form.constant', [])
     controlLabelClass: 'col-md-12',
     successClass: 'has-success',
     errorClass: 'has-error',
+    successIconClass: 'glyphicon glyphicon-ok',
+    errorIconClass: 'glyphicon glyphicon-remove'
 });
 
 angular.module('angular.form.filter', [])
@@ -22,6 +24,18 @@ angular.module('angular.form.filter', [])
                 return angularFormConfig.errorClass;
             } else if ((!input.$pristine && input.$untouched || input.$touched) && input.$valid) {
                 return angularFormConfig.successClass;
+            }
+        }
+        return '';
+    };
+}])
+.filter('formIconValidation', ['angularFormConfig', function (angularFormConfig) {
+    return function (input) {
+        if (input) {
+            if ((!input.$pristine && input.$untouched || input.$touched) && input.$invalid) {
+                return angularFormConfig.errorIconClass;
+            } else if ((!input.$pristine && input.$untouched || input.$touched) && input.$valid) {
+                return angularFormConfig.successIconClass;
             }
         }
         return '';
@@ -115,13 +129,16 @@ angular.module('angular.form.control', [
         require: '^formArea',
         restrict: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || 'fwv/template/form/control.html';
+            return attrs.templateUrl || (angular.isDefined(attrs.controlIcon) ?
+                'fwv/template/form/control-icon.html' : 'fwv/template/form/control.html');
         },
         replace: true,
         scope: {
             controlRequired: '@',
             controlMinlength: '@',
-            controlMaxlength: '@'
+            controlMaxlength: '@',
+            controlHelp: '@',
+            controlIcon: '@'
         },
         transclude: true,
         controller: function () { },
@@ -133,7 +150,6 @@ angular.module('angular.form.control', [
             $scope.controlClass = angular.isDefined($attrs.controlClass) ? $attrs.controlClass : ctrl.formControlClass;
             $scope.controlLabelClass = angular.isDefined($attrs.controlLabelClass) ? $attrs.controlLabelClass : ctrl.formControlLabelClass;
             $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : undefined;
-            $scope.controlHelp = angular.isDefined($attrs.controlHelp) ? $attrs.controlHelp : null;
 
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {
@@ -176,6 +192,7 @@ angular.module('angular.form.control.input', [])
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
+    'fwv/template/form/control-icon.html',
     'fwv/template/form/static.html',
     'fwv/template/form/input.html'
 ]);
@@ -197,6 +214,24 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
+        '   </div>\n' +
+        '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/control-icon.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/control-icon.html',
+        '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\">\n' +
+        '   <label class=\"control-label\" ng-class=\"controlLabelClass\">{{ controlLabel }}</label>\n' +
+        '   <div ng-class=\"controlClass\">\n' +
+        '       <div class=\"input-icon\" ng-class=\"controlIcon\">\n' +
+        '           <i ng-class=\"ctrl.formValidation[controlName] | formIconValidation\" />\n' +
+        '           <form-static ng-if=\"controlStatic\"></form-static>\n' +
+        '           <form-input ng-if=\"controlInput\"></form-input>\n' +
+        '           <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
+        '               {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
+        '           </span>\n' +
+        '       </div>\n' +
         '   </div>\n' +
         '</div>\n' +
         '');
