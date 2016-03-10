@@ -20,6 +20,9 @@ angular.module('angular.form.constant', [])
         formControl: 'fwv/template/form/control.html',
         formControlIcon: 'fwv/template/form/control-icon.html'
     },
+    options: {
+        validateForm: false,
+    },
     errorMessage: {
         // Todo:
     }
@@ -61,6 +64,7 @@ angular.module('angular.form.filter', [])
     };
 })
 .filter('formErrorMessage', function () {
+    // Todo:
     return function (input) {
         if (input) {
             if (input.$error && (input.$touched || (!input.$pristine && input.$untouched))) {
@@ -94,9 +98,18 @@ angular.module('angular.form.filter', [])
 });
 
 angular.module('angular.form', [])
-.controller('AngularFormController', ['$scope', '$attrs', 'angularFormConfig',
-    function ($scope, $attrs, angularFormConfig) {
-        var ctrl = this;
+.controller('AngularFormController', ['$scope', '$attrs', '$timeout', 'angularFormConfig',
+    function ($scope, $attrs, $timeout, angularFormConfig) {
+        var ctrl = this,
+            optionsUsed = !!$attrs.formOptions && angular.isDefined($scope.formOptions);
+
+        if (optionsUsed) {
+            ctrl.validateForm = angular.isDefined($scope.formOptions.validateForm) ?
+                $scope.formOptions.validateForm : angularFormConfig.options.validateForm;
+        } else {
+            ctrl.validateForm = angularFormConfig.options.validateForm;
+        }
+
         // Model where we set the form value. All form control in the form should use the same ng-model.
         ctrl.ngModel = $scope.ngModel;
         // form-control-class (Default: col-md-12)
@@ -106,14 +119,15 @@ angular.module('angular.form', [])
         // form untitled count
         ctrl.formUntitledCount = 0;
 
-        /*
-        $scope.formValidation = $scope.form;
-        ctrl.formValidation = $scope.formValidation;
-
-        $scope.$watch('formValidation', function (newValue, oldValue) {
-            ctrl.formValidation = newValue;
-        });
-        */
+        // set form validation model to the ctrl and options
+        if (ctrl.validateForm) {
+            $timeout(function () {
+                ctrl.formValidation = $scope.form;
+                if (optionsUsed) {
+                    $scope.formOptions.formValidation = ctrl.formValidation;
+                }
+            });
+        }
     }])
 .directive('formArea', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -124,7 +138,8 @@ angular.module('angular.form', [])
         },
         replace: true,
         scope: {
-            ngModel: '='
+            ngModel: '=',
+            formOptions: '=?'
         },
         controller: 'AngularFormController',
         transclude: true,
@@ -143,11 +158,12 @@ angular.module('angular.form.control', [])
         },
         replace: true,
         scope: {
-            //controlRequired: '@',
-            //controlMinlength: '@',
-            //controlMaxlength: '@',
-            //controlHelp: '@',
-            //controlIcon: '@'
+            // Todo:
+            controlRequired: '@',
+            controlMinlength: '@',
+            controlMaxlength: '@',
+            controlHelp: '@',
+            controlIcon: '@'
         },
         transclude: true,
         controller: function () { },
@@ -164,7 +180,8 @@ angular.module('angular.form.control', [])
             $scope.controlLabelClass = $attrs.controlLabelClass || ctrl.formControlLabelClass;
             // control-input-type (Default: text)
             $scope.controlInputType = $attrs.controlInputType || 'text';
-
+            // control-pattern (Default: null)
+            $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : null;
             // control-[type] enable (Default: undefined)
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {

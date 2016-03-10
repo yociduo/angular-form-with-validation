@@ -13,15 +13,16 @@ app.controller('DemoCtrl', function ($scope) {
         untitled3: 'untitled3'
     };
 
-    $scope.formModel = {
+    $scope.formModel2 = {
         static: 'static text',
         untitled1: 'untitled1',
         untitled2: 'untitled2',
         untitled3: 'untitled3'
     };
 
-    $scope.formValidation1 = new Object;
-    $scope.formValidation = new Object;
+    $scope.formOptions2 = {
+        validateForm: true
+    };
 
     $scope.setFormFieldTouch = function (form) {
         angular.forEach(form, function (that) {
@@ -37,19 +38,19 @@ app.controller('DemoCtrl', function ($scope) {
     };
 
     $scope.submit = function () {
-        if ($scope.formValidation.$valid) {
-            if ($scope.formValidation.$pristine) {
+        if ($scope.formOptions2.formValidation.$valid) {
+            if ($scope.formOptions2.formValidation.$pristine) {
                 alert('Form is pristine!');
             } else {
-                $scope.formValidation.$setSubmitted();
+                $scope.formOptions2.formValidation.$setSubmitted();
                 alert('Form is submitted!')
             }
         } else {
-            $scope.setFormFieldTouch($scope.formValidation)
+            $scope.setFormFieldTouch($scope.formOptions2.formValidation)
         }
     };
 
     $scope.reset = function () {
-        $scope.setFormPristine($scope.formValidation);
+        $scope.setFormPristine($scope.formOptions2.formValidation);
     };
 });

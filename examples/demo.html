@@ -25,15 +25,16 @@
         <div class="col-md-6">
             <form-area class="form" ng-model="formModel1">
                 <form-control control-type="input" control-name="input" control-label="Input"></form-control>
-                <form-control control-type="input"></form-control>
+                <form-control control-type="input" control-name="aaaa" control-required="true"></form-control>
                 <form-control control-type="input"></form-control>
                 <form-control control-type="input"></form-control>
                 <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
             </form-area>
         </div>
         <div class="col-md-6">
-            <!--<form-area class="form-horizontal"
-                       ng-model="formModel"
+            <form-area class="form-horizontal"
+                       ng-model="formModel2"
+                       form-options="formOptions2"
                        form-validation="formValidation"
                        form-control-class="col-md-6"
                        form-control-label-class="col-md-3">
@@ -56,7 +57,7 @@
                         <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
                     </div>
                 </div>
-            </form-area>-->
+            </form-area>
         </div>
     </div>
 
