@@ -7,7 +7,10 @@ var app = angular.module('demo', [
 
 app.controller('DemoCtrl', function ($scope) {
     $scope.formModel1 = {
-        input: 'input1'
+        input: 'input1',
+        untitled1: 'untitled1',
+        untitled2: 'untitled2',
+        untitled3: 'untitled3'
     };
 
     $scope.formModel = {

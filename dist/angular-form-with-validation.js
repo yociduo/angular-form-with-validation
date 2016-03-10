@@ -3,7 +3,8 @@ angular.module('angular-form-with-validation', [
     'angular.form.constant',
     'angular.form.filter',
     'angular.form.tpls',
-    'angular.form.control'
+    'angular.form.control',
+    'angular.form.controls'
 ]);
 
 angular.module('angular.form.constant', [])
@@ -15,7 +16,9 @@ angular.module('angular.form.constant', [])
     successIconClass: 'glyphicon glyphicon-ok',
     errorIconClass: 'glyphicon glyphicon-remove',
     templateUrl: {
-        formArea: 'fwv/template/form/area.html'
+        formArea: 'fwv/template/form/area.html',
+        formControl: 'fwv/template/form/control.html',
+        formControlIcon: 'fwv/template/form/control-icon.html'
     },
     errorMessage: {
         // Todo:
@@ -100,14 +103,17 @@ angular.module('angular.form', [])
         ctrl.formControlClass = $scope.formControlClass = $attrs.formControlClass || angularFormConfig.controlClass;
         // form-control-label-class (Default: col-md-12)
         ctrl.formControlLabelClass = $scope.formControlLabelClass = $attrs.formControlLabelClass || angularFormConfig.controlLabelClass;
+        // form untitled count
+        ctrl.formUntitledCount = 0;
 
-        //ctrl.formValidation = $scope.formValidation;
-        //ctrl.formControlLabelClass = $scope.formControlLabelClass = $attrs.formControlLabelClass || angularFormConfig.controlLabelClass;
-        //ctrl.formUntitledCount = 0;
+        /*
+        $scope.formValidation = $scope.form;
+        ctrl.formValidation = $scope.formValidation;
 
-        //$scope.$watch('formValidation', function (newValue, oldValue) {
-        //    ctrl.formValidation = newValue;
-        //});
+        $scope.$watch('formValidation', function (newValue, oldValue) {
+            ctrl.formValidation = newValue;
+        });
+        */
     }])
 .directive('formArea', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -119,68 +125,64 @@ angular.module('angular.form', [])
         replace: true,
         scope: {
             ngModel: '='
-            //formValidation: '=',
         },
         controller: 'AngularFormController',
-        controllerAs: 'form',
         transclude: true,
-        link: function ($scope, $element, $attrs) {
-            //$scope.formModel = angular.isDefined($scope.formModel) ? $scope.formModel : new Object();
-            //$scope.formValidation = $scope.form;
-        }
+        link: function ($scope, $element, $attrs) { }
     };
 }]);
 
-angular.module('angular.form.control', [
-    'angular.form.control.static',
-    'angular.form.control.input'
-])
-.controller('AngularFormControlController', ['$scope', '$attrs',
-    function ($scope, $attrs) {
-        var ctrl = this;
-
-        ctrl.ngModel = $scope.ctrl.ngModel;
-        console.log($scope);
-    }])
-.directive('formControl', function () {
+angular.module('angular.form.control', [])
+.directive('formControl', ['angularFormConfig', function (angularFormConfig) {
     return {
         require: '^formArea',
         restrict: 'E',
         templateUrl: function (element, attrs) {
             return attrs.templateUrl || (angular.isDefined(attrs.controlIcon) ?
-                'fwv/template/form/control-icon.html' : 'fwv/template/form/control.html');
+                angularFormConfig.templateUrl.formControlIcon : angularFormConfig.templateUrl.formControl);
         },
         replace: true,
         scope: {
-            controlRequired: '@',
-            controlMinlength: '@',
-            controlMaxlength: '@',
-            controlHelp: '@',
-            controlIcon: '@'
+            //controlRequired: '@',
+            //controlMinlength: '@',
+            //controlMaxlength: '@',
+            //controlHelp: '@',
+            //controlIcon: '@'
         },
         transclude: true,
         controller: function () { },
         link: function ($scope, $element, $attrs, $ctrl) {
             var ctrl = $scope.ctrl = $ctrl;
+            // control-name (Default: untitled + (i++))
             $scope.controlName = angular.isDefined($attrs.controlName) && $attrs.controlName.length > 0 ?
                 $attrs.controlName : 'untitled' + ++ctrl.formUntitledCount;
-            $scope.controlLabel = angular.isDefined($attrs.controlLabel) ? $attrs.controlLabel : 'Untitled';
-            $scope.controlClass = angular.isDefined($attrs.controlClass) ? $attrs.controlClass : ctrl.formControlClass;
-            $scope.controlLabelClass = angular.isDefined($attrs.controlLabelClass) ? $attrs.controlLabelClass : ctrl.formControlLabelClass;
-            $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : undefined;
-            $scope.controlInputType = angular.isDefined($attrs.controlInputType) ? $attrs.controlInputType : 'text';
+            // control-label (Default: Untitled)
+            $scope.controlLabel = $attrs.controlLabel || 'Untitled';
+            // control-class (Default: form-control-class)
+            $scope.controlClass = $attrs.controlClass || ctrl.formControlClass;
+            // control-label-class (Default: form-control-label-class)
+            $scope.controlLabelClass = $attrs.controlLabelClass || ctrl.formControlLabelClass;
+            // control-input-type (Default: text)
+            $scope.controlInputType = $attrs.controlInputType || 'text';
 
+            // control-[type] enable (Default: undefined)
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {
                     case 'static': $scope.controlStatic = true; break;
                     case 'input': $scope.controlInput = true; break;
+                        // TODO: ADD MORE TYPE
                 }
             }
         }
     };
-});
+}]);
 
-angular.module('angular.form.control.static', [])
+angular.module('angular.form.controls', [
+    'angular.form.controls.static',
+    'angular.form.controls.input',
+]);
+
+angular.module('angular.form.controls.static', [])
 .directive('formStatic', function () {
     return {
         require: '^formControl',
@@ -194,7 +196,7 @@ angular.module('angular.form.control.static', [])
     };
 });
 
-angular.module('angular.form.control.input', [])
+angular.module('angular.form.controls.input', [])
 .directive('formInput', function () {
     return {
         require: '^formControl',
@@ -204,9 +206,7 @@ angular.module('angular.form.control.input', [])
         },
         replace: true,
         transclude: true,
-        link: function ($scope, $element, $attrs) {
-            console.log($scope.ctrl);
-        }
+        link: function ($scope, $element, $attrs) { }
     };
 });
 
