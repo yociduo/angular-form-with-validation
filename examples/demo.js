@@ -1,13 +1,14 @@
 'use strict';
 
+// declare a dependency on the angular-form-with-validation
 var app = angular.module('demo', [
     'angular-form-with-validation'
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
     $scope.formModel1 = {
-        static: 'static text'
-    }
+        input: 'input1'
+    };
 
     $scope.formModel = {
         static: 'static text',

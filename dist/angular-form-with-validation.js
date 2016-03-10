@@ -13,7 +13,13 @@ angular.module('angular.form.constant', [])
     successClass: 'has-success',
     errorClass: 'has-error',
     successIconClass: 'glyphicon glyphicon-ok',
-    errorIconClass: 'glyphicon glyphicon-remove'
+    errorIconClass: 'glyphicon glyphicon-remove',
+    templateUrl: {
+        formArea: 'fwv/template/form/area.html'
+    },
+    errorMessage: {
+        // Todo:
+    }
 });
 
 angular.module('angular.form.filter', [])
@@ -85,45 +91,57 @@ angular.module('angular.form.filter', [])
 });
 
 angular.module('angular.form', [])
-.controller('AngularFormController', ['$scope', '$attrs', 'angularFormConfig', function ($scope, $attrs, angularFormConfig) {
-    var ctrl = this;
+.controller('AngularFormController', ['$scope', '$attrs', 'angularFormConfig',
+    function ($scope, $attrs, angularFormConfig) {
+        var ctrl = this;
+        // Model where we set the form value. All form control in the form should use the same ng-model.
+        ctrl.ngModel = $scope.ngModel;
+        // form-control-class (Default: col-md-12)
+        ctrl.formControlClass = $scope.formControlClass = $attrs.formControlClass || angularFormConfig.controlClass;
+        // form-control-label-class (Default: col-md-12)
+        ctrl.formControlLabelClass = $scope.formControlLabelClass = $attrs.formControlLabelClass || angularFormConfig.controlLabelClass;
 
-    ctrl.formModel = $scope.formModel;
-    ctrl.formValidation = $scope.formValidation;
-    ctrl.formControlClass = $scope.formControlClass = angular.isDefined($attrs.formControlClass) ?
-        $attrs.formControlClass : angularFormConfig.controlClass,
-    ctrl.formControlLabelClass = $scope.formControlLabelClass = angular.isDefined($attrs.formControlLabelClass) ?
-        $attrs.formControlLabelClass : angularFormConfig.controlLabelClass,
-    ctrl.formUntitledCount = 0;
+        //ctrl.formValidation = $scope.formValidation;
+        //ctrl.formControlLabelClass = $scope.formControlLabelClass = $attrs.formControlLabelClass || angularFormConfig.controlLabelClass;
+        //ctrl.formUntitledCount = 0;
 
-    $scope.$watch('formValidation', function (newValue, oldValue) {
-        ctrl.formValidation = newValue;
-    });
-}])
-.directive('formArea', function () {
+        //$scope.$watch('formValidation', function (newValue, oldValue) {
+        //    ctrl.formValidation = newValue;
+        //});
+    }])
+.directive('formArea', ['angularFormConfig', function (angularFormConfig) {
     return {
+        require: ['formArea', 'ngModel'],
         restrict: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || 'fwv/template/form/area.html';
+            return attrs.templateUrl || angularFormConfig.templateUrl.formArea;
         },
         replace: true,
         scope: {
-            formValidation: '=',
-            formModel: '='
+            ngModel: '='
+            //formValidation: '=',
         },
         controller: 'AngularFormController',
+        controllerAs: 'form',
         transclude: true,
         link: function ($scope, $element, $attrs) {
-            $scope.formModel = angular.isDefined($scope.formModel) ? $scope.formModel : new Object();
-            $scope.formValidation = $scope.form;
+            //$scope.formModel = angular.isDefined($scope.formModel) ? $scope.formModel : new Object();
+            //$scope.formValidation = $scope.form;
         }
     };
-});
+}]);
 
 angular.module('angular.form.control', [
     'angular.form.control.static',
     'angular.form.control.input'
 ])
+.controller('AngularFormControlController', ['$scope', '$attrs',
+    function ($scope, $attrs) {
+        var ctrl = this;
+
+        ctrl.ngModel = $scope.ctrl.ngModel;
+        console.log($scope);
+    }])
 .directive('formControl', function () {
     return {
         require: '^formArea',
@@ -186,7 +204,9 @@ angular.module('angular.form.control.input', [])
         },
         replace: true,
         transclude: true,
-        link: function ($scope, $element, $attrs) { }
+        link: function ($scope, $element, $attrs) {
+            console.log($scope.ctrl);
+        }
     };
 });
 
@@ -240,14 +260,14 @@ angular.module('fwv/template/form/control-icon.html', []).run(['$templateCache',
 
 angular.module('fwv/template/form/static.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/static.html',
-        '<p class=\"form-control-static\"> {{ ctrl.formModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/input.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/input.html',
         '<input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
-        '       ng-model=\"ctrl.formModel[controlName]\"\n' +
+        '       ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '       ng-required=\"controlRequired\"\n' +
         '       ng-pattern=\"controlPattern\"\n' +
         '       ng-minlength=\"controlMinlength\"\n' +
