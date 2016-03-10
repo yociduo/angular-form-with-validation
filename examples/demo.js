@@ -5,6 +5,10 @@ var app = angular.module('demo', [
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
+    $scope.formModel1 = {
+        static: 'static text'
+    }
+
     $scope.formModel = {
         static: 'static text',
         untitled1: 'untitled1',
@@ -12,6 +16,7 @@ app.controller('DemoCtrl', function ($scope) {
         untitled3: 'untitled3'
     };
 
+    $scope.formValidation1 = new Object;
     $scope.formValidation = new Object;
 
     $scope.setFormFieldTouch = function (form) {
