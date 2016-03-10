@@ -150,6 +150,7 @@ angular.module('angular.form.control', [
             $scope.controlClass = angular.isDefined($attrs.controlClass) ? $attrs.controlClass : ctrl.formControlClass;
             $scope.controlLabelClass = angular.isDefined($attrs.controlLabelClass) ? $attrs.controlLabelClass : ctrl.formControlLabelClass;
             $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : undefined;
+            $scope.controlInputType = angular.isDefined($attrs.controlInputType) ? $attrs.controlInputType : 'text';
 
             if (angular.isDefined($attrs.controlType)) {
                 switch ($attrs.controlType) {
@@ -245,7 +246,7 @@ angular.module('fwv/template/form/static.html', []).run(['$templateCache', funct
 
 angular.module('fwv/template/form/input.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/input.html',
-        '<input type=\"text\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
+        '<input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
         '       ng-model=\"ctrl.formModel[controlName]\"\n' +
         '       ng-required=\"controlRequired\"\n' +
         '       ng-pattern=\"controlPattern\"\n' +
