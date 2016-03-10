@@ -1,4 +1,4 @@
-angular.module('angular-form-with-validation', [
+﻿angular.module('angular-form-with-validation', [
     'angular.form',
     'angular.form.constant',
     'angular.form.filter',

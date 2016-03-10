@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 // declare a dependency on the angular-form-with-validation
 var app = angular.module('demo', [
