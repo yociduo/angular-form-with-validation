@@ -24,6 +24,9 @@ angular.module('angular.form.constant', [])
     },
     options: {
         disableValidation: false,
+        controlLabel: 'Untitled',
+        controlType: 'input',
+        controlInputType: 'text',
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -181,11 +184,11 @@ angular.module('angular.form.control', [])
         scope: {
             controlOptions: '=?',
             // Todo:
-            controlRequired: '@',
-            controlMinlength: '@',
-            controlMaxlength: '@',
-            controlHelp: '@',
-            controlIcon: '@'
+            //controlRequired: '@',
+            //controlMinlength: '@',
+            //controlMaxlength: '@',
+            //controlHelp: '@',
+            //controlIcon: '@'
         },
         transclude: true,
         controller: function () { },
@@ -197,35 +200,58 @@ angular.module('angular.form.control', [])
                 $scope.controlOptions = {};
             }
 
-            if (!optionsUsed) {
-                // control-name (Default: untitled + (i++))
-                $scope.controlName = angular.isDefined($attrs.controlName) && $attrs.controlName.length > 0 ?
-                    $attrs.controlName : 'untitled' + ++ctrl.formUntitledCount;
-                // control-label (Default: Untitled)
-                $scope.controlLabel = $attrs.controlLabel || 'Untitled';
-                // control-class (Default: form-control-class)
-                $scope.controlClass = $attrs.controlClass || ctrl.formControlClass;
-                // control-label-class (Default: form-control-label-class)
-                $scope.controlLabelClass = $attrs.controlLabelClass || ctrl.formControlLabelClass;
-                // control-input-type (Default: text)
-                $scope.controlInputType = $attrs.controlInputType || 'text';
-                // control-pattern (Default: null)
-                $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : null;
-                // control-[type] enable (Default: undefined)
-                if (angular.isDefined($attrs.controlType)) {
-                    switch ($attrs.controlType) {
-                        case 'static': $scope.controlStatic = true; break;
-                        case 'input': $scope.controlInput = true; break;
-                            // TODO: ADD MORE TYPE
-                    }
-                }
-            } else {
-                $scope.controlName = $scope.controlOptions.controlName;
-                $scope.controlLabel = $scope.controlOptions.controlLabel;
-                $scope.controlType = $scope.controlOptions.controlType;
-                $scope.controlStatic = true;
-            }
+            [
+                'controlName',          // control-name (Default: untitled + (i++))
+                'controlType',          // control-type (Default: input)
+                'controlLabel',         // control-label (Default: Untitled)
+                'controlInputType',     // control-input-type (Default: text)
+                'controlPattern',       // control-pattern (Default: null)
+                'controlClass',         // control-class (Default: form-control-class)
+                'controlLabelClass',    // control-label-class (Default: form-control-label-class)
+            ].forEach(function (key) {
+                switch (key) {
+                    case 'controlName':
+                        if (optionsUsed && angular.isDefined($scope.controlOptions[key]) && $scope.controlOptions[key].length > 0) {
+                            $scope[key] = $scope.controlOptions[key];
+                        } else if (angular.isDefined($attrs.controlName) && $attrs.controlName.length > 0) {
+                            $scope[key] = $attrs.controlName;
+                        } else {
+                            $scope[key] = '_untitled' + ++ctrl.formUntitledCount;
+                        }
+                        break;
+                    case 'controlLabel':
+                    case 'controlType': 
+                    case 'controlInputType': 
+                        if (optionsUsed) {
+                            $scope[key] = $scope.controlOptions[key] || angularFormConfig.options[key];
+                        } else {
+                            $scope[key] = $attrs[key] || angularFormConfig.options[key];
+                        }
+                        break;
+                    case 'controlClass': 
+                    case 'controlLabelClass': 
+                        if (optionsUsed) {
+                            $scope[key] = $scope.controlOptions[key] || ctrl[key];
+                        } else {
+                            $scope[key] = $attrs[key] || ctrl[key];
+                        }
+                        break;
+                    case 'controlPattern':
+                        if (optionsUsed) {
 
+                        } else {
+                            $scope[key] = angular.isDefined($attrs[key]) ? eval($attrs[key]) : null;
+                        }
+                        break;
+                }
+            });
+
+            // control-[type] enable (Default: undefined)
+            switch ($scope.controlType) {
+                case 'static': $scope.controlStatic = true; break;
+                case 'input': $scope.controlInput = true; break;
+                    // TODO: ADD MORE TYPE
+            }
         }
     };
 }]);
