@@ -24,14 +24,14 @@
     <div class="row">
         <div class="col-md-6">
             <form-area class="form" ng-model="formModel1">
-                <form-control control-type="input" control-name="input" control-label="Input"></form-control>
-                <form-control control-type="input" control-name="aaaa" control-required="true"></form-control>
-                <form-control control-type="input"></form-control>
-                <form-control control-type="input"></form-control>
-                <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
+                <form-control control-type="static" control-name="staticControl" control-label="Static Control"></form-control>
             </form-area>
         </div>
         <div class="col-md-6">
+            <form-area class="form form-horizontal" ng-model="formModel2" form-options="formOptions2">
+            </form-area>
+        </div>
+        <!--<div class="col-md-6">
             <form-area class="form-horizontal"
                        ng-model="formModel2"
                        form-options="formOptions2"
@@ -58,7 +58,7 @@
                     </div>
                 </div>
             </form-area>
-        </div>
+        </div>-->
     </div>
 
     <script type="text/javascript" src="../src/jquery/jquery.min.js"></script>

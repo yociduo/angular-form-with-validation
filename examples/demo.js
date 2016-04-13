@@ -7,50 +7,60 @@ var app = angular.module('demo', [
 
 app.controller('DemoCtrl', function ($scope) {
     $scope.formModel1 = {
-        input: 'input1',
-        untitled1: 'untitled1',
-        untitled2: 'untitled2',
-        untitled3: 'untitled3'
+        staticControl: 'email@example.com',
     };
 
-    $scope.formModel2 = {
-        static: 'static text',
-        untitled1: 'untitled1',
-        untitled2: 'untitled2',
-        untitled3: 'untitled3'
-    };
+    $scope.formModel2 = $scope.formModel1;
 
     $scope.formOptions2 = {
-        validateForm: true
+        disableValidation: false,
+        formControlClass: 'col-md-9',
+        formControlLabelClass: 'col-md-3',
+        formControls: [{
+            controlType: 'static',
+            controlName: 'staticControl',
+            controlLabel: 'Static Control'
+        }]
     };
 
-    $scope.setFormFieldTouch = function (form) {
-        angular.forEach(form, function (that) {
-            if (angular.isObject(that) && angular.isFunction(that.$setTouched)) {
-                that.$setTouched();
-            }
-        });
-    };
+    //$scope.formModel2 = {
+    //    static: 'static text',
+    //    untitled1: 'untitled1',
+    //    untitled2: 'untitled2',
+    //    untitled3: 'untitled3'
+    //};
 
-    $scope.setFormPristine = function (form) {
-        form.$setPristine();
-        form.$setUntouched();
-    };
+    //$scope.formOptions2 = {
+    //    validateForm: true
+    //};
 
-    $scope.submit = function () {
-        if ($scope.formOptions2.formValidation.$valid) {
-            if ($scope.formOptions2.formValidation.$pristine) {
-                alert('Form is pristine!');
-            } else {
-                $scope.formOptions2.formValidation.$setSubmitted();
-                alert('Form is submitted!')
-            }
-        } else {
-            $scope.setFormFieldTouch($scope.formOptions2.formValidation)
-        }
-    };
+    //$scope.setFormFieldTouch = function (form) {
+    //    angular.forEach(form, function (that) {
+    //        if (angular.isObject(that) && angular.isFunction(that.$setTouched)) {
+    //            that.$setTouched();
+    //        }
+    //    });
+    //};
 
-    $scope.reset = function () {
-        $scope.setFormPristine($scope.formOptions2.formValidation);
-    };
+    //$scope.setFormPristine = function (form) {
+    //    form.$setPristine();
+    //    form.$setUntouched();
+    //};
+
+    //$scope.submit = function () {
+    //    if ($scope.formOptions2.formValidation.$valid) {
+    //        if ($scope.formOptions2.formValidation.$pristine) {
+    //            alert('Form is pristine!');
+    //        } else {
+    //            $scope.formOptions2.formValidation.$setSubmitted();
+    //            alert('Form is submitted!')
+    //        }
+    //    } else {
+    //        $scope.setFormFieldTouch($scope.formOptions2.formValidation)
+    //    }
+    //};
+
+    //$scope.reset = function () {
+    //    $scope.setFormPristine($scope.formOptions2.formValidation);
+    //};
 });

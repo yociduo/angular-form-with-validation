@@ -9,22 +9,24 @@
 
 angular.module('angular.form.constant', [])
 .constant('angularFormConfig', {
-    controlClass: 'col-md-12',
-    controlLabelClass: 'col-md-12',
-    successClass: 'has-success',
-    errorClass: 'has-error',
-    successIconClass: 'glyphicon glyphicon-ok',
-    errorIconClass: 'glyphicon glyphicon-remove',
+    styles: {
+        formControlClass: 'col-md-12',
+        formControlLabelClass: 'col-md-12',
+        successClass: 'has-success',
+        errorClass: 'has-error',
+        successIconClass: 'glyphicon glyphicon-ok',
+        errorIconClass: 'glyphicon glyphicon-remove',
+    },
     templateUrl: {
         formArea: 'fwv/template/form/area.html',
         formControl: 'fwv/template/form/control.html',
         formControlIcon: 'fwv/template/form/control-icon.html'
     },
     options: {
-        validateForm: false,
+        disableValidation: false,
     },
     errorMessage: {
-        // Todo:
+        // Todo: Optimize to constant module
     }
 });
 
@@ -33,9 +35,9 @@ angular.module('angular.form.filter', [])
     return function (input) {
         if (input) {
             if ((!input.$pristine && input.$untouched || input.$touched) && input.$invalid) {
-                return angularFormConfig.errorClass;
+                return angularFormConfig.styles.errorClass;
             } else if ((!input.$pristine && input.$untouched || input.$touched) && input.$valid) {
-                return angularFormConfig.successClass;
+                return angularFormConfig.styles.successClass;
             }
         }
         return '';
@@ -45,9 +47,9 @@ angular.module('angular.form.filter', [])
     return function (input) {
         if (input) {
             if ((!input.$pristine && input.$untouched || input.$touched) && input.$invalid) {
-                return angularFormConfig.errorIconClass;
+                return angularFormConfig.styles.errorIconClass;
             } else if ((!input.$pristine && input.$untouched || input.$touched) && input.$valid) {
-                return angularFormConfig.successIconClass;
+                return angularFormConfig.styles.successIconClass;
             }
         }
         return '';
@@ -64,10 +66,10 @@ angular.module('angular.form.filter', [])
     };
 })
 .filter('formErrorMessage', function () {
-    // Todo:
     return function (input) {
         if (input) {
             if (input.$error && (input.$touched || (!input.$pristine && input.$untouched))) {
+                // Todo: Optimize to constant module
                 if (input.$error['required']) {
                     return 'This field is required.';
                 } else if (input.$error['maxlength']) {
@@ -100,31 +102,50 @@ angular.module('angular.form.filter', [])
 angular.module('angular.form', [])
 .controller('AngularFormController', ['$scope', '$attrs', '$timeout', 'angularFormConfig',
     function ($scope, $attrs, $timeout, angularFormConfig) {
-        var ctrl = this,
-            optionsUsed = !!$attrs.formOptions && angular.isDefined($scope.formOptions);
+        var self = this,
+            optionsUsed = $scope.optionsUsed = !!$attrs.formOptions;
 
-        if (optionsUsed) {
-            ctrl.validateForm = angular.isDefined($scope.formOptions.validateForm) ?
-                $scope.formOptions.validateForm : angularFormConfig.options.validateForm;
-        } else {
-            ctrl.validateForm = angularFormConfig.options.validateForm;
+        if (!$scope.formOptions) {
+            $scope.formOptions = {};
         }
 
+        [
+            'disableValidation',
+            'formControls',
+            'formControlClass',
+            'formControlLabelClass',
+        ].forEach(function (key) {
+            switch (key) {
+                case 'disableValidation':
+                    self[key] = angular.isDefined($scope.formOptions[key]) ?
+                        $scope.formOptions[key] : angularFormConfig.options[key];
+                    break;
+                case 'formControls':
+                    $scope[key] = angular.isArray($scope.formOptions[key]) ?
+                        $scope.formOptions[key] : null;
+                    break;
+                case 'formControlClass':
+                case 'formControlLabelClass':
+                    if (optionsUsed && angular.isDefined($scope.formOptions[key])) {
+                        self[key] = $scope[key] = $scope.formOptions[key];
+                    } else {
+                        self[key] = $scope[key] = $attrs.formControlClass || angularFormConfig.styles[key];
+                    }
+                    break;
+            }
+        });
+
         // Model where we set the form value. All form control in the form should use the same ng-model.
-        ctrl.ngModel = $scope.ngModel;
-        // form-control-class (Default: col-md-12)
-        ctrl.formControlClass = $scope.formControlClass = $attrs.formControlClass || angularFormConfig.controlClass;
-        // form-control-label-class (Default: col-md-12)
-        ctrl.formControlLabelClass = $scope.formControlLabelClass = $attrs.formControlLabelClass || angularFormConfig.controlLabelClass;
-        // form untitled count
-        ctrl.formUntitledCount = 0;
+        self.ngModel = $scope.ngModel;
+        // form untitled counter
+        self.formUntitledCount = 0;
 
         // set form validation model to the ctrl and options
-        if (ctrl.validateForm) {
+        if (self.disableValidation) {
             $timeout(function () {
-                ctrl.formValidation = $scope.form;
+                self.formValidation = $scope.form;
                 if (optionsUsed) {
-                    $scope.formOptions.formValidation = ctrl.formValidation;
+                    $scope.formOptions.formValidation = self.formValidation;
                 }
             });
         }
@@ -158,6 +179,7 @@ angular.module('angular.form.control', [])
         },
         replace: true,
         scope: {
+            controlOptions: '=?',
             // Todo:
             controlRequired: '@',
             controlMinlength: '@',
@@ -168,28 +190,42 @@ angular.module('angular.form.control', [])
         transclude: true,
         controller: function () { },
         link: function ($scope, $element, $attrs, $ctrl) {
-            var ctrl = $scope.ctrl = $ctrl;
-            // control-name (Default: untitled + (i++))
-            $scope.controlName = angular.isDefined($attrs.controlName) && $attrs.controlName.length > 0 ?
-                $attrs.controlName : 'untitled' + ++ctrl.formUntitledCount;
-            // control-label (Default: Untitled)
-            $scope.controlLabel = $attrs.controlLabel || 'Untitled';
-            // control-class (Default: form-control-class)
-            $scope.controlClass = $attrs.controlClass || ctrl.formControlClass;
-            // control-label-class (Default: form-control-label-class)
-            $scope.controlLabelClass = $attrs.controlLabelClass || ctrl.formControlLabelClass;
-            // control-input-type (Default: text)
-            $scope.controlInputType = $attrs.controlInputType || 'text';
-            // control-pattern (Default: null)
-            $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : null;
-            // control-[type] enable (Default: undefined)
-            if (angular.isDefined($attrs.controlType)) {
-                switch ($attrs.controlType) {
-                    case 'static': $scope.controlStatic = true; break;
-                    case 'input': $scope.controlInput = true; break;
-                        // TODO: ADD MORE TYPE
-                }
+            var optionsUsed = $scope.optionsUsed = !!$attrs.controlOptions,
+                ctrl = $scope.ctrl = $ctrl;
+
+            if (!$scope.controlOptions) {
+                $scope.controlOptions = {};
             }
+
+            if (!optionsUsed) {
+                // control-name (Default: untitled + (i++))
+                $scope.controlName = angular.isDefined($attrs.controlName) && $attrs.controlName.length > 0 ?
+                    $attrs.controlName : 'untitled' + ++ctrl.formUntitledCount;
+                // control-label (Default: Untitled)
+                $scope.controlLabel = $attrs.controlLabel || 'Untitled';
+                // control-class (Default: form-control-class)
+                $scope.controlClass = $attrs.controlClass || ctrl.formControlClass;
+                // control-label-class (Default: form-control-label-class)
+                $scope.controlLabelClass = $attrs.controlLabelClass || ctrl.formControlLabelClass;
+                // control-input-type (Default: text)
+                $scope.controlInputType = $attrs.controlInputType || 'text';
+                // control-pattern (Default: null)
+                $scope.controlPattern = angular.isDefined($attrs.controlPattern) ? eval($attrs.controlPattern) : null;
+                // control-[type] enable (Default: undefined)
+                if (angular.isDefined($attrs.controlType)) {
+                    switch ($attrs.controlType) {
+                        case 'static': $scope.controlStatic = true; break;
+                        case 'input': $scope.controlInput = true; break;
+                            // TODO: ADD MORE TYPE
+                    }
+                }
+            } else {
+                $scope.controlName = $scope.controlOptions.controlName;
+                $scope.controlLabel = $scope.controlOptions.controlLabel;
+                $scope.controlType = $scope.controlOptions.controlType;
+                $scope.controlStatic = true;
+            }
+
         }
     };
 }]);
@@ -237,7 +273,12 @@ angular.module('angular.form.tpls', [
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/area.html',
-        '<ng-form role="form" name="form" novalidate ng-transclude>\n' +
+        '<ng-form role=\"form\" name=\"form\" novalidate>\n' +
+        '   <ng-transclude></ng-transclude>\n' +
+        '   <div class=\"form-body\">\n' +
+        '       <form-control ng-if=\"optionsUsed\" ng-repeat=\"control in formControls\"\n' +
+        '       control-options=\"control\"></form-control>\n' +
+        '   </div>\n' +
         '</ng-form>' +
         '');
 }]);
