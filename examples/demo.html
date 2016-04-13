@@ -17,48 +17,55 @@
         body {
             padding: 15px;
         }
+
+        .row > .col-md-6 {
+            margin-bottom: 30px;
+            padding: 30px;
+            border: 1px solid #666666;
+        }
     </style>
 </head>
 <body ng-controller="DemoCtrl">
     <h3>Angular form with validation</h3>
     <div class="row">
         <div class="col-md-6">
+            <h4 class="text-center">Default Form</h4>
             <form-area class="form" ng-model="formModel1">
                 <form-control control-type="static" control-name="staticControl" control-label="Static Control"></form-control>
+                <form-control control-type="input" control-name="input" control-label="Input"></form-control>
+            </form-area>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="text-center">Form With Validation</h4>
+            <form-area class="form form-horizontal" ng-model="formModel2" form-options="formOptions2">
+                <form-control control-type="static" control-name="static" control-label="Static"></form-control>
+                <form-control control-type="input" control-name="input" control-label="Input"></form-control>
+                <form-control control-type="input" control-name="inputRequired" control-label="Required" control-required="true"></form-control>
+                <form-control control-type="input" control-name="inputMinlength" control-label="Min Length 6" control-required="true" control-minlength="6"></form-control>
+                <form-control control-type="input" control-name="inputMaxlength" control-label="Max Length 6" control-maxlength="6"></form-control>
+                <form-control control-type="input" control-name="inputPattern" control-label="Number only" control-pattern="/^\d+$/"></form-control>
+                <form-control control-type="input"></form-control>
+                <form-control control-type="input" control-name="blockHelp" control-label="Block Help" control-required="true" control-help="A block of help text."></form-control>
+                <form-control control-type="input" control-name="withIcon" control-label="With Icon" control-required="true" control-icon="right"></form-control>
+                <form-control control-type="input" control-name="withIconLeft" control-label="With Icon Left" control-required="true" control-icon="left"></form-control>
+                <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
+                <!--<div class="col-md-offset-3 col-md-9">
+                    <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+                    <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
+                </div>-->
             </form-area>
         </div>
         <div class="col-md-6">
-            <form-area class="form form-horizontal" ng-model="formModel2" form-options="formOptions2">
+            <h4 class="text-center">Form With Validation Use Options</h4>
+            <form-area class="form form-horizontal" ng-model="formModel3" form-options="formOptions3">
+                <!--<div class="col-md-offset-3 col-md-9">
+                    <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+                    <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
+                </div>-->
             </form-area>
         </div>
-        <!--<div class="col-md-6">
-            <form-area class="form-horizontal"
-                       ng-model="formModel2"
-                       form-options="formOptions2"
-                       form-validation="formValidation"
-                       form-control-class="col-md-6"
-                       form-control-label-class="col-md-3">
-                <div class="form-body">
-                    <form-control control-type="static" control-name="static" control-label="Static"></form-control>
-                    <form-control control-type="input" control-name="input" control-label="Input"></form-control>
-                    <form-control control-type="input" control-name="inputRequired" control-label="Required" control-required="true"></form-control>
-                    <form-control control-type="input" control-name="inputMinlength" control-label="Min Length 6" control-required="true" control-minlength="6"></form-control>
-                    <form-control control-type="input" control-name="inputMaxlength" control-label="Max Length 6" control-maxlength="6"></form-control>
-                    <form-control control-type="input" control-name="inputPattern" control-label="Number only" control-pattern="/^\d+$/"></form-control>
-                    <form-control control-type="input"></form-control>
-                    <form-control control-type="input" control-name="blockHelp" control-label="Block Help" control-required="true" control-help="A block of help text."></form-control>
-                    <form-control control-type="input" control-name="withIcon" control-label="With Icon" control-required="true" control-icon="right"></form-control>
-                    <form-control control-type="input" control-name="withIconLeft" control-label="With Icon Left" control-required="true" control-icon="left"></form-control>
-                    <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
-                </div>
-                <div class="form-actions">
-                    <div class="col-md-offset-3 col-md-9">
-                        <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
-                        <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
-                    </div>
-                </div>
-            </form-area>
-        </div>-->
     </div>
 
     <script type="text/javascript" src="../src/jquery/jquery.min.js"></script>
