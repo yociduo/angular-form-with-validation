@@ -28,28 +28,36 @@
 <body ng-controller="DemoCtrl">
     <h3>Angular form with validation</h3>
     <div class="row">
+        <div class="col-md-12" style="margin-bottom: 30px;">
+            <button type="button" class="btn btn-default" ng-click="toggleFormControlDisabled()">Form Enable / Disable</button>
+            <button type="button" class="btn btn-default" ng-click="toggleFormControlReadonly()">Form Writable / Readonly</button>
+            <button type="button" class="btn btn-default" ng-click="toggleControlDisabled()">Enable / Disable</button>
+            <button type="button" class="btn btn-default" ng-click="toggleControlReadonly()">Writable / Readonly</button>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <h4 class="text-center">Default Form</h4>
             <form-area class="form" ng-model="formModel1" 
                        disable-validation="disableValidation"
-                       form-controls="formOptions3.formControls"
                        form-control-disabled="formControlDisabled"
                        form-control-readonly="formControlReadonly">
                 <form-control control-type="static" control-name="staticControl" control-label="Static Control"></form-control>
                 <form-control control-type="input" control-name="input" control-label="Input"></form-control>
-                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="formControlDisabled"></form-control>
-                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="formControlReadonly"></form-control>
-                <div class="col-md-offset-3 col-md-9" style="margin-top: 30px;">
-                    <button type="button" class="btn btn-default" ng-click="formControlDisabled = !formControlDisabled">Enable / Disable</button>
-                    <button type="button" class="btn btn-default" ng-click="formControlReadonly = !formControlReadonly">Writable / Readonly</button>
-                </div>
+                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="controlDisabled"></form-control>
+                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="controlReadonly"></form-control>
             </form-area>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
             <h4 class="text-center">Form With Validation</h4>
-            <form-area class="form form-horizontal" ng-model="formModel2" form-options="formOptions2">
+            <form-area class="form form-horizontal" ng-model="formModel2"
+                       form-control-class="col-md-9"
+                       form-control-label-class="col-md-3"
+                       disable-validation="disableValidation"
+                       form-control-disabled="formControlDisabled"
+                       form-control-readonly="formControlReadonly">
                 <form-control control-type="static" control-name="static" control-label="Static"></form-control>
                 <form-control control-type="input" control-name="input" control-label="Input"></form-control>
                 <form-control control-type="input" control-name="inputRequired" control-label="Required" control-required="true"></form-control>
@@ -61,25 +69,20 @@
                 <form-control control-type="input" control-name="withIcon" control-label="With Icon" control-required="true" control-icon="right"></form-control>
                 <form-control control-type="input" control-name="withIconLeft" control-label="With Icon Left" control-required="true" control-icon="left"></form-control>
                 <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
-                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="formControlDisabled"></form-control>
-                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="formControlReadonly"></form-control>
-                <!--<div class="col-md-offset-3 col-md-9">
-                    <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
-                    <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
-                </div>-->
+                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="controlDisabled"></form-control>
+                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="controlReadonly"></form-control>
             </form-area>
         </div>
         <div class="col-md-6">
             <h4 class="text-center">Form With Validation Use Options</h4>
             <form-area class="form form-horizontal" ng-model="formModel3" form-options="formOptions3">
-                <!--<div class="col-md-offset-3 col-md-9">
-                    <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
-                    <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
-                </div>-->
             </form-area>
         </div>
     </div>
-
+    <!--<div class="col-md-offset-3 col-md-9">
+        <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+        <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
+    </div>-->
     <script type="text/javascript" src="../src/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="../src/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../src/angular/angular.min.js"></script>

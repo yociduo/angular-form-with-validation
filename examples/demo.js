@@ -9,6 +9,8 @@ app.controller('DemoCtrl', function ($scope) {
     $scope.disableValidation = true;
     $scope.formControlDisabled = false;
     $scope.formControlReadonly = false;
+    $scope.controlDisabled = true;
+    $scope.controlReadonly = true;
 
     $scope.formModel1 = {
         staticControl: 'email@example.com',
@@ -23,12 +25,6 @@ app.controller('DemoCtrl', function ($scope) {
         readonly: 'Readonly'
     };
 
-    $scope.formOptions2 = {
-        disableValidation: false,
-        formControlClass: 'col-md-9',
-        formControlLabelClass: 'col-md-3',
-    }
-
     $scope.formModel3 = {
         static: 'static text',
         _untitled1: 'untitled1',
@@ -40,6 +36,8 @@ app.controller('DemoCtrl', function ($scope) {
         disableValidation: false,
         formControlClass: 'col-md-9',
         formControlLabelClass: 'col-md-3',
+        formControlDisabled: false,
+        formControlReadonly: false,
         formControls: [
             { controlType: 'static', controlName: 'static', controlLabel: 'Static Control' },
             { controlType: 'input', controlName: 'input', controlLabel: 'Input' },
@@ -55,6 +53,26 @@ app.controller('DemoCtrl', function ($scope) {
             { controlType: 'input', controlName: 'disabled', controlLabel: 'Disabled', controlDisabled: true },
             { controlType: 'input', controlName: 'readonly', controlLabel: 'Readonly', controlReadonly: true },
         ],
+    };
+
+    $scope.toggleFormControlDisabled = function () {
+        $scope.formControlDisabled = !$scope.formControlDisabled;
+        $scope.formOptions3.formControlDisabled = !$scope.formOptions3.formControlDisabled;
+    };
+
+    $scope.toggleFormControlReadonly = function () {
+        $scope.formControlReadonly = !$scope.formControlReadonly;
+        $scope.formOptions3.formControlReadonly = !$scope.formOptions3.formControlReadonly;
+    };
+
+    $scope.toggleControlDisabled = function () {
+        $scope.controlDisabled = !$scope.controlDisabled;
+        $scope.formOptions3.formControls[11].controlDisabled = !$scope.formOptions3.formControls[11].controlDisabled;
+    };
+
+    $scope.toggleControlReadonly = function () {
+        $scope.controlReadonly = !$scope.controlReadonly;
+        $scope.formOptions3.formControls[12].controlReadonly = !$scope.formOptions3.formControls[12].controlReadonly;
     };
 
     $scope.setFormFieldTouch = function (form) {

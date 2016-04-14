@@ -126,10 +126,22 @@ angular.module('angular.form', [])
                 case 'disableValidation':   // get default from options, controls can inherits from this
                 case 'formControlDisabled':
                 case 'formControlReadonly':
-                    if (optionsUsed && angular.isDefined($scope.formOptions[key]) && typeof ($scope.formOptions[key]) == 'boolean') {
-                        self[key] = $scope.formOptions[key];
-                    } else if (!!$attrs[key] && typeof ($scope[key]) == 'boolean') {
-                        self[key] = $scope[key];
+                    if (optionsUsed && angular.isDefined($scope.formOptions[key])) {
+                        $scope.$watch('formOptions.' + key, function (newValue) {
+                            if (typeof (newValue) === 'boolean') {
+                                self[key] = newValue;
+                            } else {
+                                self[key] = angularFormConfig.options[key];
+                            }
+                        });
+                    } else if (!!$attrs[key]) {
+                        $scope.$watch(key, function (newValue) {
+                            if (typeof (newValue) === 'boolean') {
+                                self[key] = newValue;
+                            } else {
+                                self[key] = angularFormConfig.options[key];
+                            }
+                        });
                     } else {
                         self[key] = angularFormConfig.options[key];
                     }
@@ -141,9 +153,9 @@ angular.module('angular.form', [])
                 case 'formControlClass':        // get default from styles, controls can inherits from this
                 case 'formControlLabelClass':
                     if (optionsUsed && angular.isDefined($scope.formOptions[key])) {
-                        self[key] = $scope[key] = $scope.formOptions[key];
+                        self[key] = $scope.formOptions[key] || angularFormConfig.styles[key];
                     } else {
-                        self[key] = $scope[key] = $attrs[key] || angularFormConfig.styles[key];
+                        self[key] = $attrs[key] || angularFormConfig.styles[key];
                     }
                     break;
             }
@@ -257,12 +269,25 @@ angular.module('angular.form.control', [])
                     case 'controlDisabled':     // inherit from parent
                     case 'controlReadonly':
                         if (optionsUsed && angular.isDefined($scope.controlOptions[key])) {
-                            if (typeof ($scope.controlOptions[key]) === 'boolean') {
-                                $scope[key] = $scope.controlOptions[key];
-                            } 
-
+                            $scope.$watch('controlOptions.' + key, function (newValue) {
+                                if (typeof (newValue) === 'boolean') {
+                                    $scope[key] = newValue;
+                                } else {
+                                    $scope[key] = ctrl['formC' + key.substr(1)];
+                                }
+                            });
+                        } else if (!!$attrs[key]) {
+                            $scope.$watch(key, function (newValue) {
+                                if (typeof (newValue) === 'boolean') {
+                                    $scope[key] = newValue;
+                                } else {
+                                    $scope[key] = ctrl['formC' + key.substr(1)];
+                                }
+                            });
                         } else {
-                            $scope[key] = $attrs[key] || ctrl['formC' + key.substr(1)];
+                            $scope.$watch('ctrl.formC' + key.substr(1), function (newValue) {
+                                $scope[key] = newValue;
+                            });
                         }
                         break;
                     case 'controlRequired':     // form validation
