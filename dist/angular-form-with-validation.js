@@ -27,6 +27,8 @@ angular.module('angular.form.constant', [])
         controlLabel: 'Untitled',
         controlType: 'input',
         controlInputType: 'text',
+        controlDisabled: false,
+        controlReadonly: false
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -103,8 +105,8 @@ angular.module('angular.form.filter', [])
 });
 
 angular.module('angular.form', [])
-.controller('AngularFormController', ['$scope', '$attrs', '$timeout', 'angularFormConfig',
-    function ($scope, $attrs, $timeout, angularFormConfig) {
+.controller('AngularFormController', ['$scope', '$attrs', '$timeout', '$log', 'angularFormConfig',
+    function ($scope, $attrs, $timeout, $log, angularFormConfig) {
         var self = this,
             optionsUsed = $scope.optionsUsed = !!$attrs.formOptions;
 
@@ -113,21 +115,30 @@ angular.module('angular.form', [])
         }
 
         [
-            'disableValidation',
-            'formControls',
-            'formControlClass',
-            'formControlLabelClass',
+            'disableValidation',            // disable-validation (Type: boolean, Default: false)
+            'formControls',                 // form-controls (Type: Array, Default: null)
+            'formControlClass',             // form-control-class (Type: string, Default: col-md-12)
+            'formControlLabelClass',        // form-control-label-class (Type: string, Default: col-md-12)
+            'formControlDisabled',          // form-control-disabled (Type: boolean, Default: false)
+            'formControlReadonly',          // form-control-readonly (Type: boolean, Default: false)
         ].forEach(function (key) {
             switch (key) {
-                case 'disableValidation':
-                    self[key] = angular.isDefined($scope.formOptions[key]) ?
-                        $scope.formOptions[key] : angularFormConfig.options[key];
+                case 'disableValidation':   // get default from options, controls can inherits from this
+                case 'formControlReadonly':
+                case 'formControlDisabled':
+                    if (optionsUsed && angular.isDefined($scope.formOptions[key]) && typeof ($scope.formOptions[key]) == 'boolean') {
+                        self[key] = $scope.formOptions[key];
+                    } else if (!!$attrs[key] && typeof ($scope[key]) == 'boolean') {
+                            self[key] = $scope[key];
+                    } else {
+                        self[key] = angularFormConfig.options[key];
+                    }
                     break;
-                case 'formControls':
+                case 'formControls':            // form controls in options defined
                     $scope[key] = angular.isArray($scope.formOptions[key]) ?
                         $scope.formOptions[key] : null;
                     break;
-                case 'formControlClass':
+                case 'formControlClass':        // get default from styles, controls can inherits from this
                 case 'formControlLabelClass':
                     if (optionsUsed && angular.isDefined($scope.formOptions[key])) {
                         self[key] = $scope[key] = $scope.formOptions[key];
@@ -163,7 +174,10 @@ angular.module('angular.form', [])
         replace: true,
         scope: {
             ngModel: '=',
-            formOptions: '=?'
+            formOptions: '=?',
+            disableValidation: '=?',
+            formDisabled: '=?',
+            formReadonly: '=?',
         },
         controller: 'AngularFormController',
         transclude: true,
@@ -177,6 +191,7 @@ angular.module('angular.form.control', [])
         require: '^formArea',
         restrict: 'E',
         templateUrl: function (element, attrs) {
+            // Todo:
             return attrs.templateUrl || (angular.isDefined(attrs.controlIcon) ?
                 angularFormConfig.templateUrl.formControlIcon : angularFormConfig.templateUrl.formControl);
         },
@@ -201,6 +216,8 @@ angular.module('angular.form.control', [])
                 'controlInputType',     // control-input-type (Default: text)
                 'controlClass',         // control-class (Default: form-control-class)
                 'controlLabelClass',    // control-label-class (Default: form-control-label-class)
+                'controlDisabled',      // control-disabled (Default: false)
+                'controlReadonly',      // control-readonly (Default: false)
                 'controlRequired',      // control-required (Default: null)
                 'controlMinlength',     // control-minlength (Default: null)
                 'controlMaxlength',     // control-maxlength (Default: null)
@@ -219,8 +236,8 @@ angular.module('angular.form.control', [])
                         }
                         break;
                     case 'controlLabel':
-                    case 'controlType': 
-                    case 'controlInputType': 
+                    case 'controlType':
+                    case 'controlInputType':
                         if (optionsUsed) {
                             $scope[key] = $scope.controlOptions[key] || angularFormConfig.options[key];
                         } else {
@@ -229,6 +246,8 @@ angular.module('angular.form.control', [])
                         break;
                     case 'controlClass': // inherit from parent
                     case 'controlLabelClass':
+                    case 'controlDisabled':
+                    case 'controlReadonly':
                         if (optionsUsed) {
                             $scope[key] = $scope.controlOptions[key] || ctrl['formC' + key.substr(1)];
                         } else {
@@ -362,6 +381,8 @@ angular.module('fwv/template/form/input.html', []).run(['$templateCache', functi
     $templateCache.put('fwv/template/form/input.html',
         '<input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
         '       ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '       ng-disabled=\"controlDisabled\"\n' +
+        '       ng-readonly=\"controlReadonly\"\n' +
         '       ng-required=\"controlRequired\"\n' +
         '       ng-pattern=\"controlPattern\"\n' +
         '       ng-minlength=\"controlMinlength\"\n' +

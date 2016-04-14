@@ -6,8 +6,12 @@ var app = angular.module('demo', [
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
+    $scope.disableValidation = true;
+
     $scope.formModel1 = {
         staticControl: 'email@example.com',
+        disabled: 'Disabled',
+        readonly: 'Readonly'
     };
 
     $scope.formModel2 = {
@@ -38,7 +42,7 @@ app.controller('DemoCtrl', function ($scope) {
             { controlType: 'input', controlName: 'inputMaxlength', controlLabel: 'Max Length 6', controlMaxlength: 6 },
             { controlType: 'input', controlName: 'inputPattern', controlLabel: 'Number only', controlPattern: /^\d+$/ },
             { controlType: 'input' },
-            { controlType: 'input', controlName: 'blockHelp', controlLabel: 'Block Help', controlHelp: 'A block of help text.' },
+            { controlType: 'input', controlName: 'blockHelp', controlLabel: 'Block Help', controlRequired: true, controlHelp: 'A block of help text.' },
             { controlType: 'input', controlName: 'withIcon', controlLabel: 'With Icon', controlRequired: true, controlIcon: 'right' },
             { controlType: 'input', controlName: 'withIconLeft', controlLabel: 'With Icon Left', controlRequired: true, controlIcon: 'left' },
             { controlType: 'input', controlName: 'password', controlLabel: 'Password', controlInputType: 'password' },
