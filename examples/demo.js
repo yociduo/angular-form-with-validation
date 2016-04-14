@@ -7,6 +7,8 @@ var app = angular.module('demo', [
 
 app.controller('DemoCtrl', function ($scope) {
     $scope.disableValidation = true;
+    $scope.formControlDisabled = false;
+    $scope.formControlReadonly = false;
 
     $scope.formModel1 = {
         staticControl: 'email@example.com',
@@ -17,6 +19,8 @@ app.controller('DemoCtrl', function ($scope) {
     $scope.formModel2 = {
         static: 'static text',
         _untitled1: 'untitled1',
+        disabled: 'Disabled',
+        readonly: 'Readonly'
     };
 
     $scope.formOptions2 = {
@@ -28,6 +32,8 @@ app.controller('DemoCtrl', function ($scope) {
     $scope.formModel3 = {
         static: 'static text',
         _untitled1: 'untitled1',
+        disabled: 'Disabled',
+        readonly: 'Readonly'
     };
 
     $scope.formOptions3 = {
@@ -46,6 +52,8 @@ app.controller('DemoCtrl', function ($scope) {
             { controlType: 'input', controlName: 'withIcon', controlLabel: 'With Icon', controlRequired: true, controlIcon: 'right' },
             { controlType: 'input', controlName: 'withIconLeft', controlLabel: 'With Icon Left', controlRequired: true, controlIcon: 'left' },
             { controlType: 'input', controlName: 'password', controlLabel: 'Password', controlInputType: 'password' },
+            { controlType: 'input', controlName: 'disabled', controlLabel: 'Disabled', controlDisabled: true },
+            { controlType: 'input', controlName: 'readonly', controlLabel: 'Readonly', controlReadonly: true },
         ],
     };
 

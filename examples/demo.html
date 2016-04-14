@@ -30,11 +30,19 @@
     <div class="row">
         <div class="col-md-6">
             <h4 class="text-center">Default Form</h4>
-            <form-area class="form" ng-model="formModel1" disable-validation="disableValidation">
+            <form-area class="form" ng-model="formModel1" 
+                       disable-validation="disableValidation"
+                       form-controls="formOptions3.formControls"
+                       form-control-disabled="formControlDisabled"
+                       form-control-readonly="formControlReadonly">
                 <form-control control-type="static" control-name="staticControl" control-label="Static Control"></form-control>
                 <form-control control-type="input" control-name="input" control-label="Input"></form-control>
-                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="true"></form-control>
-                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="true"></form-control>
+                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="formControlDisabled"></form-control>
+                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="formControlReadonly"></form-control>
+                <div class="col-md-offset-3 col-md-9" style="margin-top: 30px;">
+                    <button type="button" class="btn btn-default" ng-click="formControlDisabled = !formControlDisabled">Enable / Disable</button>
+                    <button type="button" class="btn btn-default" ng-click="formControlReadonly = !formControlReadonly">Writable / Readonly</button>
+                </div>
             </form-area>
         </div>
     </div>
@@ -53,6 +61,8 @@
                 <form-control control-type="input" control-name="withIcon" control-label="With Icon" control-required="true" control-icon="right"></form-control>
                 <form-control control-type="input" control-name="withIconLeft" control-label="With Icon Left" control-required="true" control-icon="left"></form-control>
                 <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
+                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="formControlDisabled"></form-control>
+                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="formControlReadonly"></form-control>
                 <!--<div class="col-md-offset-3 col-md-9">
                     <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
                     <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
