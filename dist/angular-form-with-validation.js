@@ -21,6 +21,7 @@ angular.module('angular.form.constant', [])
         formStatic: 'fwv/template/form/static.html',
         formInput: 'fwv/template/form/input.html',
         formInputGroup: 'fwv/template/form/input-group.html',
+        formTextarea: 'fwv/template/form/textarea.html',
     },
     options: {
         disableValidation: false,
@@ -29,7 +30,8 @@ angular.module('angular.form.constant', [])
         controlLabel: 'Untitled',
         controlType: 'input',
         controlInputType: 'text',
-        controlGroupOptions: {}
+        controlGroupOptions: {},
+        controlRows: 4
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -309,11 +311,19 @@ angular.module('angular.form.control', [])
                 case 'static': $scope.controlStatic = true; break;
                 case 'input': $scope.controlInput = true; break;
                 case 'input-group': $scope.controlInputGroup = true;
-                    if (optionsUsed && angular.isDefined($scope.controlOptions['controlGroupOptions'])) {
-                        $scope['controlGroupOptions'] = $scope.controlOptions['controlGroupOptions'];
+                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlGroupOptions)) {
+                        $scope.controlGroupOptions = $scope.controlOptions.controlGroupOptions;
                     } else {
-                        $scope['controlGroupOptions'] = $scope['controlGroupOptions'] || handpickFormConfig.options['controlGroupOptions'];
+                        $scope.controlGroupOptions = $scope.controlGroupOptions || angularFormConfig.options.controlGroupOptions;
                     }
+                    break;
+                case 'textarea': $scope.controlTextArea = true;
+                    if (optionsUsed) {
+                        $scope.controlRows = $scope.controlOptions.controlRows || handpickFormConfig.options.controlRows;
+                    } else {
+                        $scope.controlRows = $attrs.controlRows || angularFormConfig.options.controlRows;
+                    }
+                    break;
             break;
             // TODO: ADD MORE TYPE
         }
@@ -325,6 +335,7 @@ angular.module('angular.form.controls', [
     'angular.form.controls.static',
     'angular.form.controls.input',
     'angular.form.controls.input-group',
+    'angular.form.controls.textarea',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -369,12 +380,27 @@ angular.module('angular.form.controls.input-group', [])
     };
 }]);
 
+angular.module('angular.form.controls.textarea', [])
+.directive('formTextarea', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formTextarea;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
     'fwv/template/form/static.html',
     'fwv/template/form/input.html',
     'fwv/template/form/input-group.html',
+    'fwv/template/form/textarea.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -397,6 +423,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-static ng-if=\"controlStatic\"></form-static>\n' +
         '       <form-input ng-if=\"controlInput\"></form-input>\n' +
         '       <form-input-group ng-if=\"controlInputGroup\"></form-input-group>\n' +
+        '       <form-textarea ng-if=\"controlTextArea\"></form-textarea>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -440,5 +467,21 @@ angular.module('fwv/template/form/input-group.html', []).run(['$templateCache', 
         '           ng-maxlength=\"controlMaxlength\" />\n' +
         '   <div ng-if=\"controlGroupOptions.after\" class=\"input-group-{{controlGroupOptions.after.type}}\" ng-bind-html=\"controlGroupOptions.after.html|formHtml\"></div>\n' +
         '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/textarea.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/textarea.html',
+        '<textarea type=\"{{controlInputType}}\" name=\"{{controlName}}\" class=\"form-control\"\n' +
+        '       ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '       placeholder=\"{{controlPlaceholder}}\"\n' +
+        '       ng-disabled=\"controlDisabled\"\n' +
+        '       ng-readonly=\"controlReadonly\"\n' +
+        '       ng-required=\"controlRequired\"\n' +
+        '       ng-pattern=\"controlPattern\"\n' +
+        '       ng-minlength=\"controlMinlength\"\n' +
+        '       ng-maxlength=\"controlMaxlength\"\n' +
+        '       rows=\"{{controlRows}}\"\n' +
+        '</textarea>\n' +
         '');
 }]);
