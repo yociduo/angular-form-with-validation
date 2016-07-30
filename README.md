@@ -29,4 +29,4 @@
    * **controlClass** - *( Type: string, Default: Inherit from parent )* - Add ability to use custom classes to current form control, This must be a string.
    * **controlLabelClass** - *( Type: string. Default: Inherit from parent )* - Add ability to use custom classes to current form control labels, This must be a string.
    * **controlPlaceholder** - *( Type: string, Default: null )* - Add ability to use custom placeholder text.
-* **control-*** - *( Type: string, Default: _untitled(i++) )* - Same as the "control-***" property in "control-options".
+* **control-***** - *( Type: string, Default: _untitled(i++) )* - Same as the "control-***" property in "control-options".
