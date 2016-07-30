@@ -7,7 +7,7 @@
 * **template-url** *( C, Default: fwv/template/form/area.html )* - Override the template for the component with a custom provided template.
 * **form-options** *( $ )* - An object to configure the form in one place.
     * **disableValidation** *( C, Type: boolean, Default: false )* - Whether the form validate disable or not.
-    * **formValidateion** - An object to save the form validation in one place.
+    * **formValidation** - An object to save the form validation in one place.
     * **formControls** *( Type: Array, Default: [] )* - An array of objects defining options for each form controls.
     * **formControlDisabled** *( C Watch, Type: boolean, Default: false )* - Add ability to set child controls disabled.
     * **formControlReadonly** *( C Watch, Type: boolean, Default: false )* - Add ability to set child controls readonly.
@@ -28,10 +28,5 @@
    * **controlReadonly** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control readonly.
    * **controlClass** - *( Type: string, Default: Inherit from parent )* - Add ability to use custom classes to current form control, This must be a string.
    * **controlLabelClass** - *( Type: string. Default: Inherit from parent )* - Add ability to use custom classes to current form control labels, This must be a string.
-* **control-name** - *( Type: string, Default: _untitled(i++) )* - Same as the "controlName" property in "control-options".
-* **control-type** - *( C, Type: string, Default: input )* - Same as the "controlType" property in "control-options".
-* **control-label** - *( C, Type: string, Default: Untitled )* - Same as the "controlLabel" property in "control-options".
-* **control-disabled** - *( $ Watch, Type: boolean, Default: Inherit from parent )* - Same as the "controlDisabled" property in "control-options".
-* **control-readonly** - *( $ Watch, Type: boolean, Default: Inherit from parent )* - Same as the "controlReadonly" property in "control-options".
-* **control-class** - *( Type: string, Default: Inherit from parent )* - Same as the "controlClass" property in "control-options".
-* **control-label-class** - *( Type: string, Default: Inherit from parent )* - Same as the "controlLabelClass" property in "control-options".
+   * **controlPlaceholder** - *( Type: string, Default: null )* - Add ability to use custom placeholder text.
+* **control-*** - *( Type: string, Default: _untitled(i++) )* - Same as the "control-***" property in "control-options".
