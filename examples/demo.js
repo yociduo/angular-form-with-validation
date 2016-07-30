@@ -18,6 +18,17 @@ app.controller('DemoCtrl', function ($scope) {
         readonly: 'Readonly'
     };
 
+    $scope.groupOptions = {
+        before: {
+            type: 'addon',
+            html: '<i class=\"glyphicon glyphicon-user\"></i>'
+        },
+        after: {
+            type: 'btn',
+            html: '<button type=\"button\" class=\"btn btn-default\">Action</button>'
+        }
+    }
+
     $scope.toggleFormControlDisabled = function () {
         $scope.formControlDisabled = !$scope.formControlDisabled;
     };

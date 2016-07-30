@@ -20,6 +20,7 @@ angular.module('angular.form.constant', [])
         formControl: 'fwv/template/form/control.html',
         formStatic: 'fwv/template/form/static.html',
         formInput: 'fwv/template/form/input.html',
+        formInputGroup: 'fwv/template/form/input-group.html',
     },
     options: {
         disableValidation: false,
@@ -28,6 +29,7 @@ angular.module('angular.form.constant', [])
         controlLabel: 'Untitled',
         controlType: 'input',
         controlInputType: 'text',
+        controlGroupOptions: {}
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -89,7 +91,12 @@ angular.module('angular.form.filter', [])
         }
         return '';
     };
-});
+})
+.filter('formHtml', ['$sce', function ($sce) {
+    return function (val) {
+        return $sce.trustAsHtml(val);
+    };
+}]);
 
 angular.module('angular.form', [])
 .controller('AngularFormController', ['$scope', '$attrs', '$timeout', '$log', 'angularFormConfig',
@@ -197,6 +204,7 @@ angular.module('angular.form.control', [])
             controlOptions: '=?',
             controlDisabled: '=?',
             controlReadonly: '=?',
+            controlGroupOptions: '=?',
         },
         transclude: true,
         controller: function () { },
@@ -300,15 +308,23 @@ angular.module('angular.form.control', [])
             switch ($scope.controlType) {
                 case 'static': $scope.controlStatic = true; break;
                 case 'input': $scope.controlInput = true; break;
-                    // TODO: ADD MORE TYPE
-            }
+                case 'input-group': $scope.controlInputGroup = true;
+                    if (optionsUsed && angular.isDefined($scope.controlOptions['controlGroupOptions'])) {
+                        $scope['controlGroupOptions'] = $scope.controlOptions['controlGroupOptions'];
+                    } else {
+                        $scope['controlGroupOptions'] = $scope['controlGroupOptions'] || handpickFormConfig.options['controlGroupOptions'];
+                    }
+            break;
+            // TODO: ADD MORE TYPE
         }
-    };
+    }
+};
 }]);
 
 angular.module('angular.form.controls', [
     'angular.form.controls.static',
     'angular.form.controls.input',
+    'angular.form.controls.input-group',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -339,11 +355,26 @@ angular.module('angular.form.controls.input', [])
     };
 }]);
 
+angular.module('angular.form.controls.input-group', [])
+.directive('formInputGroup', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formInputGroup;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
     'fwv/template/form/static.html',
-    'fwv/template/form/input.html'
+    'fwv/template/form/input.html',
+    'fwv/template/form/input-group.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -365,6 +396,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '   <div ng-class=\"controlClass\">\n' +
         '       <form-static ng-if=\"controlStatic\"></form-static>\n' +
         '       <form-input ng-if=\"controlInput\"></form-input>\n' +
+        '       <form-input-group ng-if=\"controlInputGroup\"></form-input-group>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -390,5 +422,23 @@ angular.module('fwv/template/form/input.html', []).run(['$templateCache', functi
         '       ng-pattern=\"controlPattern\"\n' +
         '       ng-minlength=\"controlMinlength\"\n' +
         '       ng-maxlength=\"controlMaxlength\" />\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/input-group.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/input-group.html',
+        '<div class=\"input-group\">\n' +
+        '   <div ng-if=\"controlGroupOptions.before\" class=\"input-group-{{controlGroupOptions.before.type}}\" ng-bind-html=\"controlGroupOptions.before.html|formHtml\"></div>\n' +
+        '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
+        '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '           placeholder=\"{{controlPlaceholder}}\"\n' +
+        '           ng-disabled=\"controlDisabled\"\n' +
+        '           ng-readonly=\"controlReadonly\"\n' +
+        '           ng-required=\"controlRequired\"\n' +
+        '           ng-pattern=\"controlPattern\"\n' +
+        '           ng-minlength=\"controlMinlength\"\n' +
+        '           ng-maxlength=\"controlMaxlength\" />\n' +
+        '   <div ng-if=\"controlGroupOptions.after\" class=\"input-group-{{controlGroupOptions.after.type}}\" ng-bind-html=\"controlGroupOptions.after.html|formHtml\"></div>\n' +
+        '</div>\n' +
         '');
 }]);

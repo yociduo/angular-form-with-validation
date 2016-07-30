@@ -1,0 +1,13 @@
+<div class="input-group">
+    <div ng-if="controlGroupOptions.before" class="input-group-{{controlGroupOptions.before.type}}" ng-bind-html="controlGroupOptions.before.html|formHtml"></div>
+    <input type="{{ controlInputType }}" name="{{ controlName }}" class="form-control"
+           ng-model="ctrl.ngModel[controlName]"
+           placeholder="{{controlPlaceholder}}"
+           ng-disabled="controlDisabled"
+           ng-readonly="controlReadonly"
+           ng-required="controlRequired"
+           ng-pattern="controlPattern"
+           ng-minlength="controlMinlength"
+           ng-maxlength="controlMaxlength" />
+    <div ng-if="controlGroupOptions.after" class="input-group-{{controlGroupOptions.after.type}}" ng-bind-html="controlGroupOptions.after.html|formHtml"></div>
+</div>
