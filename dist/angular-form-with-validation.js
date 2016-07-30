@@ -20,7 +20,9 @@ angular.module('angular.form.constant', [])
     templateUrl: {
         formArea: 'fwv/template/form/area.html',
         formControl: 'fwv/template/form/control.html',
-        formControlIcon: 'fwv/template/form/control-icon.html'
+        formControlIcon: 'fwv/template/form/control-icon.html',
+        formStatic: 'fwv/template/form/static.html',
+        formInput: 'fwv/template/form/input.html',
     },
     options: {
         disableValidation: false,
@@ -167,14 +169,14 @@ angular.module('angular.form', [])
         self.formUntitledCount = 0;
 
         // set form validation model to the ctrl and options
-        if (!self.disableValidation) {
-            $timeout(function () {
+        $timeout(function () {
+            if (!self.disableValidation) {
                 self.formValidation = $scope.form;
                 if (optionsUsed) {
                     $scope.formOptions.formValidation = $scope.form;
                 }
-            });
-        }
+            }
+        });
     }])
 .directive('formArea', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -228,6 +230,7 @@ angular.module('angular.form.control', [])
                 'controlLabel',         // control-label (Default: Untitled)
                 'controlType',          // control-type (Default: input)
                 'controlInputType',     // control-input-type (Default: text)
+                'controlPlaceholder',   // control-placeholder (Default: null)
                 'controlClass',         // control-class (Default: form-control-class)
                 'controlLabelClass',    // control-label-class (Default: form-control-label-class)
                 'controlDisabled',      // control-disabled (Default: false)
@@ -252,6 +255,7 @@ angular.module('angular.form.control', [])
                     case 'controlLabel':        // get from config
                     case 'controlType':
                     case 'controlInputType':
+                    case 'controlPlaceholder':
                         if (optionsUsed) {
                             $scope[key] = $scope.controlOptions[key] || angularFormConfig.options[key];
                         } else {
@@ -327,32 +331,32 @@ angular.module('angular.form.controls', [
 ]);
 
 angular.module('angular.form.controls.static', [])
-.directive('formStatic', function () {
+.directive('formStatic', ['angularFormConfig', function (angularFormConfig) {
     return {
         require: '^formControl',
         restric: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || 'fwv/template/form/static.html';
+            return attrs.templateUrl || angularFormConfig.templateUrl.formStatic;
         },
         replace: true,
         transclude: true,
         link: function ($scope, $element, $attrs) { }
     };
-});
+}]);
 
 angular.module('angular.form.controls.input', [])
-.directive('formInput', function () {
+.directive('formInput', ['angularFormConfig', function (angularFormConfig) {
     return {
         require: '^formControl',
         restric: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || 'fwv/template/form/input.html';
+            return attrs.templateUrl || angularFormConfig.templateUrl.formInput;
         },
         replace: true,
         transclude: true,
         link: function ($scope, $element, $attrs) { }
     };
-});
+}]);
 
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
@@ -417,6 +421,7 @@ angular.module('fwv/template/form/input.html', []).run(['$templateCache', functi
     $templateCache.put('fwv/template/form/input.html',
         '<input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
         '       ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '       placeholder=\"{{controlPlaceholder}}\"\n' +
         '       ng-disabled=\"controlDisabled\"\n' +
         '       ng-readonly=\"controlReadonly\"\n' +
         '       ng-required=\"controlRequired\"\n' +

@@ -18,27 +18,23 @@
             padding: 15px;
         }
 
-        .row > .col-md-6 {
+        .row > * {
             margin-bottom: 30px;
-            padding: 30px;
-            border: 1px solid #666666;
         }
     </style>
 </head>
 <body ng-controller="DemoCtrl">
     <h3>Angular form with validation</h3>
     <div class="row">
-        <div class="col-md-12" style="margin-bottom: 30px;">
+        <div class="col-md-12">
             <button type="button" class="btn btn-default" ng-click="toggleFormControlDisabled()">Form Enable / Disable</button>
             <button type="button" class="btn btn-default" ng-click="toggleFormControlReadonly()">Form Writable / Readonly</button>
             <button type="button" class="btn btn-default" ng-click="toggleControlDisabled()">Enable / Disable</button>
             <button type="button" class="btn btn-default" ng-click="toggleControlReadonly()">Writable / Readonly</button>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <h4 class="text-center">Default Form</h4>
-            <form-area class="form" ng-model="formModel1" 
+            <form-area class="form" ng-model="formModel" 
                        disable-validation="disableValidation"
                        form-control-disabled="formControlDisabled"
                        form-control-readonly="formControlReadonly">
@@ -46,36 +42,7 @@
                 <form-control control-type="input" control-name="input" control-label="Input"></form-control>
                 <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="controlDisabled"></form-control>
                 <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="controlReadonly"></form-control>
-            </form-area>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <h4 class="text-center">Form With Validation</h4>
-            <form-area class="form form-horizontal" ng-model="formModel2"
-                       form-control-class="col-md-9"
-                       form-control-label-class="col-md-3"
-                       disable-validation="disableValidation"
-                       form-control-disabled="formControlDisabled"
-                       form-control-readonly="formControlReadonly">
-                <form-control control-type="static" control-name="static" control-label="Static"></form-control>
-                <form-control control-type="input" control-name="input" control-label="Input"></form-control>
-                <form-control control-type="input" control-name="inputRequired" control-label="Required" control-required="true"></form-control>
-                <form-control control-type="input" control-name="inputMinlength" control-label="Min Length 6" control-required="true" control-minlength="6"></form-control>
-                <form-control control-type="input" control-name="inputMaxlength" control-label="Max Length 6" control-maxlength="6"></form-control>
-                <form-control control-type="input" control-name="inputPattern" control-label="Number only" control-pattern="/^\d+$/"></form-control>
-                <form-control control-type="input"></form-control>
-                <form-control control-type="input" control-name="blockHelp" control-label="Block Help" control-required="true" control-help="A block of help text."></form-control>
-                <form-control control-type="input" control-name="withIcon" control-label="With Icon" control-required="true" control-icon="right"></form-control>
-                <form-control control-type="input" control-name="withIconLeft" control-label="With Icon Left" control-required="true" control-icon="left"></form-control>
-                <form-control control-type="input" control-name="password" control-label="Password" control-input-type="password"></form-control>
-                <form-control control-type="input" control-name="disabled" control-label="Disabled" control-disabled="controlDisabled"></form-control>
-                <form-control control-type="input" control-name="readonly" control-label="Readonly" control-readonly="controlReadonly"></form-control>
-            </form-area>
-        </div>
-        <div class="col-md-6">
-            <h4 class="text-center">Form With Validation Use Options</h4>
-            <form-area class="form form-horizontal" ng-model="formModel3" form-options="formOptions3">
+                <form-control control-type="input" control-name="placeholder" control-label="Placeholder" control-placeholder="placeholder..."></form-control>
             </form-area>
         </div>
     </div>
