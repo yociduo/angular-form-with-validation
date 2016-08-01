@@ -24,6 +24,7 @@ angular.module('angular.form.constant', [])
         formTextarea: 'fwv/template/form/textarea.html',
         formSelect: 'fwv/template/form/select.html',
         formMutipleSelect: 'fwv/template/form/mutiple-select.html',
+        formRadio: 'fwv/template/form/radio.html',
     },
     options: {
         disableValidation: false,
@@ -34,7 +35,15 @@ angular.module('angular.form.constant', [])
         controlInputType: 'text',
         controlGroupOptions: {},
         controlRows: 4,
-        controlSelectOptions: {},
+        controlSelectOptions: {
+            options: [],
+            ngOptions: ''
+        },
+        controlRadioOptions: {
+            options: [],
+            listClass: '',
+            itemClass: ''
+        },
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -211,6 +220,7 @@ angular.module('angular.form.control', [])
             controlReadonly: '=?',
             controlGroupOptions: '=?',
             controlSelectOptions: '=?',
+            controlRadioOptions: '=?',
         },
         transclude: true,
         controller: function () { },
@@ -342,11 +352,19 @@ angular.module('angular.form.control', [])
                         $scope.controlSelectOptions = $scope.controlSelectOptions || angularFormConfig.options.controlSelectOptions;
                     }
                     break;
-            break;
-            // TODO: ADD MORE TYPE
+                case 'radio': $scope.controlRadio = true;
+                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlRadioOptions)) {
+                        $scope.controlRadioOptions = $scope.controlOptions.controlRadioOptions;
+                    } else {
+                        $scope.controlRadioOptions = $scope.controlRadioOptions || angularFormConfig.options.controlRadioOptions;
+                    }
+                    break;
+
+                    break;
+                    // TODO: ADD MORE TYPE
+            }
         }
-    }
-};
+    };
 }]);
 
 angular.module('angular.form.controls', [
@@ -356,6 +374,7 @@ angular.module('angular.form.controls', [
     'angular.form.controls.textarea',
     'angular.form.controls.select',
     'angular.form.controls.mutiple-select',
+    'angular.form.controls.radio',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -442,6 +461,20 @@ angular.module('angular.form.controls.mutiple-select', [])
     };
 }]);
 
+angular.module('angular.form.controls.radio', [])
+.directive('formRadio', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formRadio;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
@@ -451,6 +484,7 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/textarea.html',
     'fwv/template/form/select.html',
     'fwv/template/form/mutiple-select.html',
+    'fwv/template/form/radio.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -476,6 +510,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-textarea ng-if=\"controlTextArea\"></form-textarea>\n' +
         '       <form-select ng-if=\"controlSelect\"></form-select>\n' +
         '       <form-mutiple-select ng-if=\"controlMutipleSelect\"></form-mutiple-select>\n' +
+        '       <form-radio ng-if=\"controlRadio\"></form-radio>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -561,5 +596,28 @@ angular.module('fwv/template/form/mutiple-select.html', []).run(['$templateCache
         '        ng-pattern=\"controlPattern\"\n' +
         '        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
         '</select>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/radio.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/radio.html',
+        '<div ng-class=\"controlRadioOptions.listClass\">\n' +
+        '    <label ng-repeat=\"option in controlRadioOptions.options\"' +
+        '           ng-class=\"controlRadioOptions.itemClass\">\n' +
+        '       <input type=\"radio\" name=\"{{ controlName }}\"' +
+        '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '              ng-disabled=\"controlDisabled\"\n' +
+        '              ng-readonly=\"controlReadonly\"\n' +
+        '              ng-required=\"controlRequired\"\n' +
+        '              ng-value=\"{{option.value}}\" /> {{option.key}}\n' +
+        '    </label>\n' +
+        //'<select name=\"{{controlName}}\" class=\"form-control\" multiple\n' +
+        //'        ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        //'        ng-disabled=\"controlDisabled\"\n' +
+        //'        \n' +
+        //'        ng-required=\"controlRequired\"\n' +
+        //'        ng-pattern=\"controlPattern\"\n' +
+        //'        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
+        //'</select>\n' +
         '');
 }]);

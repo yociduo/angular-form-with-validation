@@ -18,6 +18,7 @@ app.controller('DemoCtrl', function ($scope) {
         readonly: 'Readonly',
         select: 1,
         mutipleSelect: [1, 2, 3],
+        radio: 1,
     };
 
     $scope.groupOptions = {
@@ -41,6 +42,16 @@ app.controller('DemoCtrl', function ($scope) {
             { key: 'Options 5', value: 5 },
         ],
         ngOptions: 'option.value*1 as option.key for option in controlSelectOptions.options',
+    };
+
+    $scope.radioOptions = {
+        options: [
+            { key: 'Options 1', value: 1 },
+            { key: 'Options 2', value: 2 },
+            { key: 'Options 3', value: 3 },
+        ],
+        listClass: '',
+        itemClass: 'checkbox-inline'
     };
 
     $scope.toggleFormControlDisabled = function () {
