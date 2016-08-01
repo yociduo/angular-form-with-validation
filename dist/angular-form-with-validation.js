@@ -22,6 +22,8 @@ angular.module('angular.form.constant', [])
         formInput: 'fwv/template/form/input.html',
         formInputGroup: 'fwv/template/form/input-group.html',
         formTextarea: 'fwv/template/form/textarea.html',
+        formSelect: 'fwv/template/form/select.html',
+        formMutipleSelect: 'fwv/template/form/mutiple-select.html',
     },
     options: {
         disableValidation: false,
@@ -31,7 +33,8 @@ angular.module('angular.form.constant', [])
         controlType: 'input',
         controlInputType: 'text',
         controlGroupOptions: {},
-        controlRows: 4
+        controlRows: 4,
+        controlSelectOptions: {},
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -207,6 +210,7 @@ angular.module('angular.form.control', [])
             controlDisabled: '=?',
             controlReadonly: '=?',
             controlGroupOptions: '=?',
+            controlSelectOptions: '=?',
         },
         transclude: true,
         controller: function () { },
@@ -324,6 +328,20 @@ angular.module('angular.form.control', [])
                         $scope.controlRows = $attrs.controlRows || angularFormConfig.options.controlRows;
                     }
                     break;
+                case 'select': $scope.controlSelect = true;
+                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlSelectOptions)) {
+                        $scope.controlSelectOptions = $scope.controlOptions.controlSelectOptions;
+                    } else {
+                        $scope.controlSelectOptions = $scope.controlSelectOptions || angularFormConfig.options.controlSelectOptions;
+                    }
+                    break;
+                case 'mutiple-select': $scope.controlMutipleSelect = true;
+                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlSelectOptions)) {
+                        $scope.controlSelectOptions = $scope.controlOptions.controlSelectOptions;
+                    } else {
+                        $scope.controlSelectOptions = $scope.controlSelectOptions || angularFormConfig.options.controlSelectOptions;
+                    }
+                    break;
             break;
             // TODO: ADD MORE TYPE
         }
@@ -336,6 +354,8 @@ angular.module('angular.form.controls', [
     'angular.form.controls.input',
     'angular.form.controls.input-group',
     'angular.form.controls.textarea',
+    'angular.form.controls.select',
+    'angular.form.controls.mutiple-select',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -394,6 +414,34 @@ angular.module('angular.form.controls.textarea', [])
     };
 }]);
 
+angular.module('angular.form.controls.select', [])
+.directive('formSelect', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formSelect;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
+angular.module('angular.form.controls.mutiple-select', [])
+.directive('formMutipleSelect', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formMutipleSelect;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
@@ -401,6 +449,8 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/input.html',
     'fwv/template/form/input-group.html',
     'fwv/template/form/textarea.html',
+    'fwv/template/form/select.html',
+    'fwv/template/form/mutiple-select.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -424,6 +474,8 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-input ng-if=\"controlInput\"></form-input>\n' +
         '       <form-input-group ng-if=\"controlInputGroup\"></form-input-group>\n' +
         '       <form-textarea ng-if=\"controlTextArea\"></form-textarea>\n' +
+        '       <form-select ng-if=\"controlSelect\"></form-select>\n' +
+        '       <form-mutiple-select ng-if=\"controlMutipleSelect\"></form-mutiple-select>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -481,7 +533,33 @@ angular.module('fwv/template/form/textarea.html', []).run(['$templateCache', fun
         '       ng-pattern=\"controlPattern\"\n' +
         '       ng-minlength=\"controlMinlength\"\n' +
         '       ng-maxlength=\"controlMaxlength\"\n' +
-        '       rows=\"{{controlRows}}\"\n' +
+        '       rows=\"{{controlRows}}\">\n' +
         '</textarea>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/select.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/select.html',
+        '<select name=\"{{controlName}}\" class=\"form-control\"\n' +
+        '        ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '        ng-disabled=\"controlDisabled\"\n' +
+        '        ng-readonly=\"controlReadonly\"\n' +
+        '        ng-required=\"controlRequired\"\n' +
+        '        ng-pattern=\"controlPattern\"\n' +
+        '        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
+        '</select>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/mutiple-select.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/mutiple-select.html',
+        '<select name=\"{{controlName}}\" class=\"form-control\" multiple\n' +
+        '        ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '        ng-disabled=\"controlDisabled\"\n' +
+        '        ng-readonly=\"controlReadonly\"\n' +
+        '        ng-required=\"controlRequired\"\n' +
+        '        ng-pattern=\"controlPattern\"\n' +
+        '        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
+        '</select>\n' +
         '');
 }]);
