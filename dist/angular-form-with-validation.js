@@ -674,6 +674,15 @@ angular.module('fwv/template/form/checkbox.html', []).run(['$templateCache', fun
 
 angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/checkbox-list.html',
-        '<label>Test</label>' +
+        '<div ng-class=\"controlGeneralOptions.listClass\">\n' +
+        '    <label ng-repeat=\"option in controlGeneralOptions.options\"' +
+        '           ng-class=\"controlGeneralOptions.itemClass\">\n' +
+        '       <input type=\"checkbox\" name=\"{{ controlName }}\"\n' +
+        '              checklist-model=\"ctrl.ngModel[controlName]\"\n' +
+        '              checklist-value=\"option.value\"\n' +
+        '              ng-disabled=\"controlDisabled\"\n' +
+        '              ng-readonly=\"controlReadonly\" /> {{option.key}}\n' +
+        '    </label>\n' +
+        '</div>\n' +
         '');
 }]);

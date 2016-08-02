@@ -2,7 +2,8 @@
 
 // declare a dependency on the angular-form-with-validation
 var app = angular.module('demo', [
-    'angular-form-with-validation'
+    'angular-form-with-validation',
+    'checklist-model'
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
@@ -20,6 +21,7 @@ app.controller('DemoCtrl', function ($scope) {
         mutipleSelect: [1, 2, 3],
         radio: 1,
         checkbox: true,
+        checkboxes: [1, 2],
     };
 
     $scope.groupOptions = {
@@ -51,6 +53,16 @@ app.controller('DemoCtrl', function ($scope) {
         ],
         listClass: '',
         itemClass: 'radio-inline'
+    };
+
+    $scope.checkboxOptions = {
+        options: [
+            { key: 'Options 1', value: 1 },
+            { key: 'Options 2', value: 2 },
+            { key: 'Options 3', value: 3 },
+        ],
+        listClass: '',
+        itemClass: 'checkbox-inline'
     };
 
     $scope.toggleFormControlDisabled = function () {
