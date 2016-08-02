@@ -39,6 +39,7 @@ angular.module('angular.form.constant', [])
         controlGeneralOptions: {
             options: [],
         },
+        controlCheckboxLabel: 'Default',
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -240,7 +241,7 @@ angular.module('angular.form.control', [])
                 'controlMaxlength',         // control-maxlength (Default: null)
                 'controlHelp',              // control-help (Default: null)
                 'controlPattern',           // control-pattern (Default: null)
-                'controlGeneralOptions',    // control-general-opitons (Default: { options:[] })
+                'controlGeneralOptions',    // control-general-opitons (Default: { options: [] })
             ].forEach(function (key) {
                 switch (key) {
                     case 'controlName':         // get from untitled
@@ -336,8 +337,14 @@ angular.module('angular.form.control', [])
                 case 'select': $scope.controlSelect = true; break;
                 case 'mutipleSelect': $scope.controlMutipleSelect = true; break;
                 case 'radio': $scope.controlRadio = true; break;
-                case 'checkbox': $scope.controlCheckbox = true; break;
-                case 'checkboxList': $scope.controlCheckbox = true; break;
+                case 'checkbox': $scope.controlCheckbox = true;
+                    if (optionsUsed) {
+                        $scope.controlCheckboxLabel = $scope.controlOptions.controlCheckboxLabel || angularFormConfig.options.controlCheckboxLabel;
+                    } else {
+                        $scope.controlCheckboxLabel = $attrs.controlCheckboxLabel || angularFormConfig.options.controlCheckboxLabel;
+                    }
+                    break;
+                case 'checkboxList': $scope.controlCheckboxList = true; break;
                 case 'tagsInput': $scope.controlTagsInput = true; break;
                 case 'datePicker': $scope.controlDatePicker = true; break;
                 case 'dateRange': $scope.controlDateRange = true; break;
@@ -375,6 +382,8 @@ angular.module('angular.form.controls', [
     'angular.form.controls.select',
     'angular.form.controls.mutiple-select',
     'angular.form.controls.radio',
+    'angular.form.controls.checkbox',
+    'angular.form.controls.checkbox-list',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -477,6 +486,34 @@ angular.module('angular.form.controls.radio', [])
     };
 }]);
 
+angular.module('angular.form.controls.checkbox', [])
+.directive('formCheckbox', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formCheckbox;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
+angular.module('angular.form.controls.checkbox-list', [])
+.directive('formCheckboxList', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formCheckboxList;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
@@ -487,6 +524,8 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/select.html',
     'fwv/template/form/mutiple-select.html',
     'fwv/template/form/radio.html',
+    'fwv/template/form/checkbox.html',
+    'fwv/template/form/checkbox-list.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -513,6 +552,8 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-select ng-if=\"controlSelect\"></form-select>\n' +
         '       <form-mutiple-select ng-if=\"controlMutipleSelect\"></form-mutiple-select>\n' +
         '       <form-radio ng-if=\"controlRadio\"></form-radio>\n' +
+        '       <form-checkbox ng-if=\"controlCheckbox\"></form-checkbox>\n' +
+        '       <form-checkbox-list ng-if=\"controlCheckboxList\"></form-checkbox-list>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -607,12 +648,32 @@ angular.module('fwv/template/form/radio.html', []).run(['$templateCache', functi
         '<div ng-class=\"controlGeneralOptions.listClass\">\n' +
         '    <label ng-repeat=\"option in controlGeneralOptions.options\"' +
         '           ng-class=\"controlGeneralOptions.itemClass\">\n' +
-        '       <input type=\"radio\" name=\"{{ controlName }}\"' +
+        '       <input type=\"radio\" name=\"{{ controlName }}\"\n' +
         '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
         '              ng-readonly=\"controlReadonly\"\n' +
         '              ng-required=\"controlRequired\"\n' +
         '              ng-value=\"{{option.value}}\" /> {{option.key}}\n' +
         '    </label>\n' +
+        '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/checkbox.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/checkbox.html',
+        '<div>\n' +
+        '    <label class=\"checkbox-inline\">\n' +
+        '       <input type=\"checkbox\" name=\"{{ controlName }}\"\n' +
+        '              ng-model=\"ctrl.ngModel[controlName]\"\n' + 
+        '              ng-disabled=\"controlDisabled\"\n' +
+        '              ng-readonly=\"controlReadonly\"\n /> {{controlCheckboxLabel}}\n' +
+        '    </label>\n' +
+        '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/checkbox-list.html',
+        '<label>Test</label>' +
         '');
 }]);

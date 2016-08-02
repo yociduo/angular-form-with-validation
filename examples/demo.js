@@ -19,6 +19,7 @@ app.controller('DemoCtrl', function ($scope) {
         select: null,
         mutipleSelect: [1, 2, 3],
         radio: 1,
+        checkbox: true,
     };
 
     $scope.groupOptions = {
@@ -49,7 +50,7 @@ app.controller('DemoCtrl', function ($scope) {
             { key: 'Options 3', value: 3 },
         ],
         listClass: '',
-        itemClass: 'checkbox-inline'
+        itemClass: 'radio-inline'
     };
 
     $scope.toggleFormControlDisabled = function () {

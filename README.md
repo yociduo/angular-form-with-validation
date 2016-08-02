@@ -22,15 +22,14 @@
 #### form-control
 * **control-options** *( $ )* - An object to configure the control in one place.
    * **controlName** - *( Type: string, Default: _untitled{i++} )* - The key of the property in parent "ng-model". If empty, it will be named as "_untitled1", "_untitled2", and so on
-   * **controlType** - *( C, Type: string, Default: input )* - The type of the control. It supports `static|input|input-group|textarea|select|mutiple-select|radio`.
+   * **controlType** - *( C, Type: string, Default: input )* - The type of the control. It supports `static|input|inputGroup|textarea|select|mutipleSelect|radio|checkbox`.
    * **controlLabel** - *( C, Type: string, Default: Untitled )* - The title of the control.
    * **controlDisabled** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control disabled.
    * **controlReadonly** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control readonly.
    * **controlClass** - *( Type: string, Default: Inherit from parent )* - Add ability to use custom classes to current form control, This must be a string.
    * **controlLabelClass** - *( Type: string. Default: Inherit from parent )* - Add ability to use custom classes to current form control labels, This must be a string.
    * **controlPlaceholder** - *( Type: string, Default: null )* - Add ability to use custom placeholder text.
-   * **controlGroupOptions** - *( Type: object, Default: {} )* - Extend form controls by adding text or buttons before, after, or both sides, e.g: { before: { type: 'addon', html: '$' }, after: { type: 'addon', html: '.00' } }.
+   * **controlGeneralOptions** - *( Type: object, Default: {} )* - Add ability to add text or buttons before, after, or both sides and add ability to set options, e.g (in inputGroup): { before: { type: 'addon', html: '$' }, after: { type: 'addon', html: '.00' } }, e.g (in select): { options: [ { key: 'Options 1', value 1 } ] }.
    * **controlRows** - *( Type: int, Default: 4 )* - Add ability to set textarea rows.
-   * **controlSelectOptions** - *( Type: object, Default: in config )* - Add ability to set select options, e.g: { options: [ { key: 'Options 1', value 1 } ], ngOptions: 'option.value*1 as option.key for option in controlSelectOptions.options' }
-   * **controlRadioOptions** - *(Type: object, Default: in config )* - Add ability to set radio options, e.g: {  }
+   * **controlCheckboxLabel** - *( Type: string, Default: Default )* - Add ability to set checkbox label.
 * **control-***** - *( Type: string, Default: _untitled(i++) )* - Same as the "control-***" property in "control-options".
