@@ -25,6 +25,8 @@ angular.module('angular.form.constant', [])
         formSelect: 'fwv/template/form/select.html',
         formMutipleSelect: 'fwv/template/form/mutiple-select.html',
         formRadio: 'fwv/template/form/radio.html',
+        formCheckbox: 'fwv/template/form/checkbox.html',
+        formCheckboxList: 'fwv/template/form/checkbox-list.html',
     },
     options: {
         disableValidation: false,
@@ -33,16 +35,9 @@ angular.module('angular.form.constant', [])
         controlLabel: 'Untitled',
         controlType: 'input',
         controlInputType: 'text',
-        controlGroupOptions: {},
         controlRows: 4,
-        controlSelectOptions: {
+        controlGeneralOptions: {
             options: [],
-            ngOptions: ''
-        },
-        controlRadioOptions: {
-            options: [],
-            listClass: '',
-            itemClass: ''
         },
     },
     errorMessage: {
@@ -218,9 +213,7 @@ angular.module('angular.form.control', [])
             controlOptions: '=?',
             controlDisabled: '=?',
             controlReadonly: '=?',
-            controlGroupOptions: '=?',
-            controlSelectOptions: '=?',
-            controlRadioOptions: '=?',
+            controlGeneralOptions: '=?',
         },
         transclude: true,
         controller: function () { },
@@ -233,20 +226,21 @@ angular.module('angular.form.control', [])
             }
 
             [
-                'controlName',          // control-name (Default: _untitled + (i++))
-                'controlLabel',         // control-label (Default: Untitled)
-                'controlType',          // control-type (Default: input)
-                'controlInputType',     // control-input-type (Default: text)
-                'controlPlaceholder',   // control-placeholder (Default: null)
-                'controlClass',         // control-class (Default: form-control-class)
-                'controlLabelClass',    // control-label-class (Default: form-control-label-class)
-                'controlDisabled',      // control-disabled (Default: false)
-                'controlReadonly',      // control-readonly (Default: false)
-                'controlRequired',      // control-required (Default: null)
-                'controlMinlength',     // control-minlength (Default: null)
-                'controlMaxlength',     // control-maxlength (Default: null)
-                'controlHelp',          // control-help (Default: null)
-                'controlPattern',       // control-pattern (Default: null)
+                'controlName',              // control-name (Default: _untitled + (i++))
+                'controlLabel',             // control-label (Default: Untitled)
+                'controlType',              // control-type (Default: input)
+                'controlInputType',         // control-input-type (Default: text)
+                'controlPlaceholder',       // control-placeholder (Default: null)
+                'controlClass',             // control-class (Default: form-control-class)
+                'controlLabelClass',        // control-label-class (Default: form-control-label-class)
+                'controlDisabled',          // control-disabled (Default: false)
+                'controlReadonly',          // control-readonly (Default: false)
+                'controlRequired',          // control-required (Default: null)
+                'controlMinlength',         // control-minlength (Default: null)
+                'controlMaxlength',         // control-maxlength (Default: null)
+                'controlHelp',              // control-help (Default: null)
+                'controlPattern',           // control-pattern (Default: null)
+                'controlGeneralOptions',    // control-general-opitons (Default: { options:[] })
             ].forEach(function (key) {
                 switch (key) {
                     case 'controlName':         // get from untitled
@@ -317,6 +311,13 @@ angular.module('angular.form.control', [])
                             $scope[key] = eval($attrs[key]);
                         }
                         break;
+                    case 'controlGeneralOptions':
+                        if (optionsUsed && angular.isDefined($scope.controlOptions[key])) {
+                            $scope[key] = $scope.controlOptions[key];
+                        } else {
+                            $scope[key] = $scope[key] || angularFormConfig.options[key];
+                        }
+                        break;
                 }
             });
 
@@ -324,13 +325,7 @@ angular.module('angular.form.control', [])
             switch ($scope.controlType) {
                 case 'static': $scope.controlStatic = true; break;
                 case 'input': $scope.controlInput = true; break;
-                case 'input-group': $scope.controlInputGroup = true;
-                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlGroupOptions)) {
-                        $scope.controlGroupOptions = $scope.controlOptions.controlGroupOptions;
-                    } else {
-                        $scope.controlGroupOptions = $scope.controlGroupOptions || angularFormConfig.options.controlGroupOptions;
-                    }
-                    break;
+                case 'inputGroup': $scope.controlInputGroup = true; break;
                 case 'textarea': $scope.controlTextArea = true;
                     if (optionsUsed) {
                         $scope.controlRows = $scope.controlOptions.controlRows || handpickFormConfig.options.controlRows;
@@ -338,34 +333,39 @@ angular.module('angular.form.control', [])
                         $scope.controlRows = $attrs.controlRows || angularFormConfig.options.controlRows;
                     }
                     break;
-                case 'select': $scope.controlSelect = true;
-                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlSelectOptions)) {
-                        $scope.controlSelectOptions = $scope.controlOptions.controlSelectOptions;
-                    } else {
-                        $scope.controlSelectOptions = $scope.controlSelectOptions || angularFormConfig.options.controlSelectOptions;
-                    }
-                    break;
-                case 'mutiple-select': $scope.controlMutipleSelect = true;
-                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlSelectOptions)) {
-                        $scope.controlSelectOptions = $scope.controlOptions.controlSelectOptions;
-                    } else {
-                        $scope.controlSelectOptions = $scope.controlSelectOptions || angularFormConfig.options.controlSelectOptions;
-                    }
-                    break;
-                case 'radio': $scope.controlRadio = true;
-                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlRadioOptions)) {
-                        $scope.controlRadioOptions = $scope.controlOptions.controlRadioOptions;
-                    } else {
-                        $scope.controlRadioOptions = $scope.controlRadioOptions || angularFormConfig.options.controlRadioOptions;
-                    }
-                    break;
-
-                    break;
-                    // TODO: ADD MORE TYPE
+                case 'select': $scope.controlSelect = true; break;
+                case 'mutipleSelect': $scope.controlMutipleSelect = true; break;
+                case 'radio': $scope.controlRadio = true; break;
+                case 'checkbox': $scope.controlCheckbox = true; break;
+                case 'checkboxList': $scope.controlCheckbox = true; break;
+                case 'tagsInput': $scope.controlTagsInput = true; break;
+                case 'datePicker': $scope.controlDatePicker = true; break;
+                case 'dateRange': $scope.controlDateRange = true; break;
+                case 'timePicker': $scope.controlTimePicker = true; break;
+                case 'rangeSlider': $scope.controlRangeSlider = true; break;
+                case 'autoComplete': $scope.controlAutoComplete = true; break;
+                case 'treeView': $scope.controlTreeView = true; break;
+                case 'input-tags': $scope.controlInputTags = true; break;
+                case 'richText': $scope.controlRichText = true; break;
+                case 'fileUpload': $scope.controlFileUpload = true; break;
+                case 'fileUploadAndCrop': $scope.controlFileUploadAndCrop = true; break;
             }
         }
     };
-}]);
+}])
+.directive('convertToNumber', function () {
+    return {
+        require: 'ngModel',
+        link: function (scope, element, attrs, ngModel) {
+            ngModel.$parsers.push(function (val) {
+                return parseInt(val, 10);
+            });
+            ngModel.$formatters.push(function (val) {
+                return '' + val;
+            });
+        }
+    };
+});
 
 angular.module('angular.form.controls', [
     'angular.form.controls.static',
@@ -443,7 +443,9 @@ angular.module('angular.form.controls.select', [])
         },
         replace: true,
         transclude: true,
-        link: function ($scope, $element, $attrs) { }
+        link: function ($scope, $element, $attrs) {
+            (!$scope.ctrl.ngModel[$scope.controlName]) && ($scope.ctrl.ngModel[$scope.controlName] = '');
+        }
     };
 }]);
 
@@ -542,7 +544,7 @@ angular.module('fwv/template/form/input.html', []).run(['$templateCache', functi
 angular.module('fwv/template/form/input-group.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/input-group.html',
         '<div class=\"input-group\">\n' +
-        '   <div ng-if=\"controlGroupOptions.before\" class=\"input-group-{{controlGroupOptions.before.type}}\" ng-bind-html=\"controlGroupOptions.before.html|formHtml\"></div>\n' +
+        '   <div ng-if=\"controlGeneralOptions.before\" class=\"input-group-{{controlGeneralOptions.before.type}}\" ng-bind-html=\"controlGeneralOptions.before.html|formHtml\"></div>\n' +
         '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
         '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '           placeholder=\"{{controlPlaceholder}}\"\n' +
@@ -552,7 +554,7 @@ angular.module('fwv/template/form/input-group.html', []).run(['$templateCache', 
         '           ng-pattern=\"controlPattern\"\n' +
         '           ng-minlength=\"controlMinlength\"\n' +
         '           ng-maxlength=\"controlMaxlength\" />\n' +
-        '   <div ng-if=\"controlGroupOptions.after\" class=\"input-group-{{controlGroupOptions.after.type}}\" ng-bind-html=\"controlGroupOptions.after.html|formHtml\"></div>\n' +
+        '   <div ng-if=\"controlGeneralOptions.after\" class=\"input-group-{{controlGeneralOptions.after.type}}\" ng-bind-html=\"controlGeneralOptions.after.html|formHtml\"></div>\n' +
         '</div>\n' +
         '');
 }]);
@@ -575,35 +577,36 @@ angular.module('fwv/template/form/textarea.html', []).run(['$templateCache', fun
 
 angular.module('fwv/template/form/select.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/select.html',
-        '<select name=\"{{controlName}}\" class=\"form-control\"\n' +
+        '<select name=\"{{controlName}}\" class=\"form-control\" convert-to-number\n' +
         '        ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '        ng-disabled=\"controlDisabled\"\n' +
         '        ng-readonly=\"controlReadonly\"\n' +
         '        ng-required=\"controlRequired\"\n' +
-        '        ng-pattern=\"controlPattern\"\n' +
-        '        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
+        '        ng-pattern=\"controlPattern\">\n' +
+        '   <option value=\"\" ng-if=\"controlPlaceholder\">{{controlPlaceholder}}</option>\n' +
+        '   <option value=\"{{option.value}}\" ng-repeat=\"option in controlGeneralOptions.options\">{{option.key}}</option>\n' +
         '</select>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/mutiple-select.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/mutiple-select.html',
-        '<select name=\"{{controlName}}\" class=\"form-control\" multiple\n' +
+        '<select name=\"{{controlName}}\" class=\"form-control\" multiple convert-to-number\n' +
         '        ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '        ng-disabled=\"controlDisabled\"\n' +
         '        ng-readonly=\"controlReadonly\"\n' +
         '        ng-required=\"controlRequired\"\n' +
-        '        ng-pattern=\"controlPattern\"\n' +
-        '        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
+        '        ng-pattern=\"controlPattern\">\n' +
+        '   <option value=\"{{option.value}}\" ng-repeat=\"option in controlGeneralOptions.options\">{{option.key}}</option>\n' +
         '</select>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/radio.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/radio.html',
-        '<div ng-class=\"controlRadioOptions.listClass\">\n' +
-        '    <label ng-repeat=\"option in controlRadioOptions.options\"' +
-        '           ng-class=\"controlRadioOptions.itemClass\">\n' +
+        '<div ng-class=\"controlGeneralOptions.listClass\">\n' +
+        '    <label ng-repeat=\"option in controlGeneralOptions.options\"' +
+        '           ng-class=\"controlGeneralOptions.itemClass\">\n' +
         '       <input type=\"radio\" name=\"{{ controlName }}\"' +
         '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
@@ -611,13 +614,5 @@ angular.module('fwv/template/form/radio.html', []).run(['$templateCache', functi
         '              ng-required=\"controlRequired\"\n' +
         '              ng-value=\"{{option.value}}\" /> {{option.key}}\n' +
         '    </label>\n' +
-        //'<select name=\"{{controlName}}\" class=\"form-control\" multiple\n' +
-        //'        ng-model=\"ctrl.ngModel[controlName]\"\n' +
-        //'        ng-disabled=\"controlDisabled\"\n' +
-        //'        \n' +
-        //'        ng-required=\"controlRequired\"\n' +
-        //'        ng-pattern=\"controlPattern\"\n' +
-        //'        ng-options=\"{{controlSelectOptions.ngOptions}}\"\n' +
-        //'</select>\n' +
         '');
 }]);

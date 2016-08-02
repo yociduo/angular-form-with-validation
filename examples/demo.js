@@ -16,7 +16,7 @@ app.controller('DemoCtrl', function ($scope) {
         staticControl: 'email@example.com',
         disabled: 'Disabled',
         readonly: 'Readonly',
-        select: 1,
+        select: null,
         mutipleSelect: [1, 2, 3],
         radio: 1,
     };
@@ -34,14 +34,12 @@ app.controller('DemoCtrl', function ($scope) {
 
     $scope.selectOptions = {
         options: [
-            { key: 'Please Select...', value: 0 },
             { key: 'Options 1', value: 1 },
             { key: 'Options 2', value: 2 },
             { key: 'Options 3', value: 3 },
             { key: 'Options 4', value: 4 },
             { key: 'Options 5', value: 5 },
-        ],
-        ngOptions: 'option.value*1 as option.key for option in controlSelectOptions.options',
+        ]
     };
 
     $scope.radioOptions = {
