@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en" ng-app="demo">
+<head>
+    <meta charset="utf-8" />
+    <title>AngularJS form-validation</title>
+
+    <link rel="stylesheet" href="../src/bootstrap/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../src/bootstrap/css/bootstrap-theme.min.css" type="text/css" />
+
+    <link rel="stylesheet" href="../dist/angular-form-with-validation.css" type="text/css" />
+
+    <style type="text/css">
+        h3 {
+            margin-bottom: 50px;
+        }
+
+        body {
+            padding: 15px;
+        }
+
+        .row > * {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body ng-controller="DemoWithOptionsCtrl">
+    <h3>Angular form with validation</h3>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-default" ng-click="toggleFormControlDisabled()">Form Enable / Disable</button>
+            <button type="button" class="btn btn-default" ng-click="toggleFormControlReadonly()">Form Writable / Readonly</button>
+            <button type="button" class="btn btn-default" ng-click="toggleControlDisabled()">Enable / Disable</button>
+            <button type="button" class="btn btn-default" ng-click="toggleControlReadonly()">Writable / Readonly</button>
+        </div>
+        <div class="col-md-12">
+            <h4 class="text-center">Default Form</h4>
+            <form-area class="form form-horizontal" ng-model="formModel" form-options="formOptions"></form-area>
+        </div>
+    </div>
+    <!--<div class="col-md-offset-3 col-md-9">
+        <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+        <button type="button" class="btn btn-success" ng-click="submit()">Submit</button>
+    </div>-->
+    <script type="text/javascript" src="../src/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../src/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../src/angular/angular.min.js"></script>
+    <script type="text/javascript" src="../src/checklist-model/checklist-model.js"></script>
+    <script type="text/javascript" src="../dist/angular-form-with-validation.js"></script>
+    <script type="text/javascript" src="demo-with-options.js"></script>
+</body>
+</html>
