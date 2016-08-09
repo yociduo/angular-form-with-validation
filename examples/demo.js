@@ -3,7 +3,8 @@
 // declare a dependency on the angular-form-with-validation
 var app = angular.module('demo', [
     'angular-form-with-validation',
-    'checklist-model'
+    'checklist-model',
+    'bootstrap-tagsinput'
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
@@ -22,7 +23,8 @@ app.controller('DemoCtrl', function ($scope) {
         radio: 1,
         checkbox: true,
         checkboxes: [1, 2],
-        treeView: [1, 2]
+        treeView: [1, 2],
+        tagsInput: ['Tag1', 'Tag2']
     };
 
     $scope.groupOptions = {

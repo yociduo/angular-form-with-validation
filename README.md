@@ -22,7 +22,7 @@
 #### form-control
 * **control-options** *( $ )* - An object to configure the control in one place.
    * **controlName** - *( Type: string, Default: _untitled{i++} )* - The key of the property in parent "ng-model". If empty, it will be named as "_untitled1", "_untitled2", and so on
-   * **controlType** - *( C, Type: string, Default: input )* - The type of the control. It supports `static|input|password|input-group|textarea|select|mutiple-select|radio|checkbox|checkbox-list|tree-view`.
+   * **controlType** - *( C, Type: string, Default: input )* - The type of the control. It supports `static|input|password|input-group|textarea|select|mutiple-select|radio|checkbox|checkbox-list|tree-view|tags-input`.
    * **controlLabel** - *( C, Type: string, Default: Untitled )* - The title of the control.
    * **controlDisabled** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control disabled.
    * **controlReadonly** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control readonly.
@@ -32,4 +32,5 @@
    * **controlGeneralOptions** - *( Type: object, Default: {} )* - Add ability to add text or buttons before, after, or both sides and add ability to set options, e.g (in inputGroup): { before: { type: 'addon', html: '$' }, after: { type: 'addon', html: '.00' } }, e.g (in select): { options: [ { key: 'Options 1', value 1 } ] }.
    * **controlRows** - *( Type: int, Default: 4 )* - Add ability to set textarea rows.
    * **controlCheckboxLabel** - *( Type: string, Default: Default )* - Add ability to set checkbox label.
+   * **controlTagClass** *( C, Type: string, Default: label label-success)* - Add ability to use custom classes for tags class, This must be a string.
 * **control-***** - *( Type: string, Default: _untitled(i++) )* - Same as the "control-***" property in "control-options".

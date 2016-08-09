@@ -14,6 +14,7 @@ angular.module('angular.form.constant', [])
         formControlLabelClass: 'col-md-12',
         successClass: 'has-success',
         errorClass: 'has-error',
+        controlTagClass: 'label label-success',
     },
     templateUrl: {
         formArea: 'fwv/template/form/area.html',
@@ -28,6 +29,7 @@ angular.module('angular.form.constant', [])
         formCheckbox: 'fwv/template/form/checkbox.html',
         formCheckboxList: 'fwv/template/form/checkbox-list.html',
         formTreeView: 'fwv/template/form/tree-view.html',
+        formTagsInput: 'fwv/template/form/tags-input.html',
     },
     options: {
         disableValidation: false,
@@ -235,6 +237,7 @@ angular.module('angular.form.control', [])
                 'controlPlaceholder',       // control-placeholder (Default: null)
                 'controlClass',             // control-class (Default: form-control-class)
                 'controlLabelClass',        // control-label-class (Default: form-control-label-class)
+                'controlTagClass',          // control-tag-class (Default: label label-success)
                 'controlDisabled',          // control-disabled (Default: false)
                 'controlReadonly',          // control-readonly (Default: false)
                 'controlRequired',          // control-required (Default: null)
@@ -270,6 +273,13 @@ angular.module('angular.form.control', [])
                             $scope[key] = $scope.controlOptions[key];
                         } else {
                             $scope[key] = $attrs[key] || ctrl['formC' + key.substr(1)];
+                        }
+                        break;
+                    case 'controlTagClass':     // get form styles
+                        if (optionsUsed) {
+                            $scope[key] = $scope.controlOptions[key] || angularFormConfig.styles[key];
+                        } else {
+                            $scope[key] = $attrs[key] || angularFormConfig.styles[key];
                         }
                         break;
                     case 'controlDisabled':     // inherit from parent
@@ -364,10 +374,9 @@ angular.module('angular.form.control', [])
 
             // set current control touched
             $scope.controlSetTouched = function () {
-                if (ctrl.formValidation && $scope.controlGeneralOptions) {
-                    angular.forEach($scope.controlGeneralOptions.options, function (option, $index) {
-                        ctrl.formValidation[$scope.controlName].$setTouched();
-                    });
+                if (ctrl.formValidation) {
+                    ctrl.formValidation.$setDirty();
+                    ctrl.formValidation[$scope.controlName].$setTouched();
                 }
             }
         }
@@ -398,6 +407,7 @@ angular.module('angular.form.controls', [
     'angular.form.controls.checkbox',
     'angular.form.controls.checkbox-list',
     'angular.form.controls.tree-view',
+    'angular.form.controls.tags-input',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -601,13 +611,49 @@ angular.module('angular.form.controls.tree-view', [])
 
             // Todo: change this function
             $scope.$watch('ctrl.ngModel[controlName]', function (newValue) {
-                console.log(newValue);
                 if (newValue) {
                     $element.find('.tree-view').jstree(true).deselect_all();
                     $element.find('.tree-view').jstree(true).select_node(newValue);
                 } else {
                     $scope.ctrl.ngModel[$scope.controlName] = [];
                 }
+            });
+        }
+    };
+}]);
+
+angular.module('angular.form.controls.tags-input', [])
+.directive('formTagsInput', ['angularFormConfig', '$timeout', function (angularFormConfig, $timeout) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formTagsInput;
+        },
+        replace: false,
+        transclude: false,
+        link: function ($scope, $element, $attrs) {
+            var ctrl = $scope.$parent.ctrl,
+                tagsinput = $element.find('select');
+
+            $scope.init = false;
+
+            tagsinput.on('itemAdded', function (event) {
+                if ($scope.init) {
+                    $scope.controlSetTouched();
+                    $scope.$apply();
+                }
+            });
+
+            tagsinput.on('itemRemoved', function (event) {
+                if ($scope.init) {
+                    $scope.controlSetTouched();
+                    $scope.$apply();
+                }
+            });
+
+            $timeout(function () {
+                $scope.init = true;
             });
         }
     };
@@ -626,6 +672,7 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/checkbox.html',
     'fwv/template/form/checkbox-list.html',
     'fwv/template/form/tree-view.html',
+    'fwv/template/form/tags-input.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -655,6 +702,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-checkbox ng-if=\"controlCheckbox\"></form-checkbox>\n' +
         '       <form-checkbox-list ng-if=\"controlCheckboxList\"></form-checkbox-list>\n' +
         '       <form-tree-view ng-if=\"controlTreeView\"></form-tree-view>\n' +
+        '       <form-tags-input ng-if=\"controlTagsInput\"></form-tags-input>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -801,5 +849,14 @@ angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', fu
         '    <div class=\"tree-view\"></div>\n' +
         '    <input type=\"text\" name=\"{{controlName}}\" ng-model=\"ctrl.ngModel[controlName]\" class=\"hidden\" />\n' +
         '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/tags-input.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/tags-input.html',
+        '<bootstrap-tagsinput name=\"{{controlName}}\" class=\"full-width\"\n' +
+        '                     tagclass=\"{{controlTagClass}}\"\n' +
+        '                     ng-model=\"ctrl.ngModel[controlName]\">\n' +
+        '</bootstrap-tagsinput>\n' +
         '');
 }]);

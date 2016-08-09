@@ -81,3 +81,9 @@ Input icons
     margin-top: 8px;
     font-size: 13px;
 }
+
+/* BEGIN TAGS INPUT */
+.full-width .bootstrap-tagsinput {
+    width: 100%;
+}
+/* END TAGS INPUT */
