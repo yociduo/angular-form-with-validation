@@ -16,6 +16,7 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
         radio: 1,
         checkbox: true,
         checkboxes: [1, 2],
+        treeView: [1, 2]
     };
 
     $scope.formOptions = {
@@ -81,6 +82,18 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
                     ],
                     listClass: '',
                     itemClass: 'checkbox-inline'
+                }
+            },
+            {
+                controlType: 'tree-view', controlName: 'treeView', controlLabel: 'Tree View', controlGeneralOptions: {
+                    options: [
+                        { id: 1, parent: '#', text: 'root 1' },
+                        { id: 2, parent: '#', text: 'root 2' },
+                        { id: 3, parent: 1, text: 'child 1' },
+                        { id: 4, parent: 1, text: 'child 2' },
+                        { id: 5, parent: 2, text: 'child 3' },
+                        { id: 6, parent: 2, text: 'child 4' },
+                    ]
                 }
             }
         ]

@@ -22,7 +22,7 @@
 #### form-control
 * **control-options** *( $ )* - An object to configure the control in one place.
    * **controlName** - *( Type: string, Default: _untitled{i++} )* - The key of the property in parent "ng-model". If empty, it will be named as "_untitled1", "_untitled2", and so on
-   * **controlType** - *( C, Type: string, Default: input )* - The type of the control. It supports `static|input|password|input-group|textarea|select|mutiple-select|radio|checkbox|checkbox-list`.
+   * **controlType** - *( C, Type: string, Default: input )* - The type of the control. It supports `static|input|password|input-group|textarea|select|mutiple-select|radio|checkbox|checkbox-list|tree-view`.
    * **controlLabel** - *( C, Type: string, Default: Untitled )* - The title of the control.
    * **controlDisabled** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control disabled.
    * **controlReadonly** - *( Watch Type: boolean, Default: Inherit from parent )* - Add ability to set current control readonly.

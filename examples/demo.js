@@ -22,6 +22,7 @@ app.controller('DemoCtrl', function ($scope) {
         radio: 1,
         checkbox: true,
         checkboxes: [1, 2],
+        treeView: [1, 2]
     };
 
     $scope.groupOptions = {
@@ -63,6 +64,17 @@ app.controller('DemoCtrl', function ($scope) {
         ],
         listClass: '',
         itemClass: 'checkbox-inline'
+    };
+
+    $scope.treeViewOptions = {
+        options: [
+            { id: 1, parent: '#', text: 'root 1' },
+            { id: 2, parent: '#', text: 'root 2' },
+            { id: 3, parent: 1, text: 'child 1' },
+            { id: 4, parent: 1, text: 'child 2' },
+            { id: 5, parent: 2, text: 'child 3' },
+            { id: 6, parent: 2, text: 'child 4' },
+        ]
     };
 
     $scope.toggleFormControlDisabled = function () {

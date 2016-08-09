@@ -27,6 +27,7 @@ angular.module('angular.form.constant', [])
         formRadio: 'fwv/template/form/radio.html',
         formCheckbox: 'fwv/template/form/checkbox.html',
         formCheckboxList: 'fwv/template/form/checkbox-list.html',
+        formTreeView: 'fwv/template/form/tree-view.html',
     },
     options: {
         disableValidation: false,
@@ -396,6 +397,7 @@ angular.module('angular.form.controls', [
     'angular.form.controls.radio',
     'angular.form.controls.checkbox',
     'angular.form.controls.checkbox-list',
+    'angular.form.controls.tree-view',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -526,6 +528,91 @@ angular.module('angular.form.controls.checkbox-list', [])
     };
 }]);
 
+angular.module('angular.form.controls.tree-view', [])
+.directive('formTreeView', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formTreeView;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) {
+            if (!$.jstree) { return; }
+
+            angular.forEach($scope.controlGeneralOptions.options, function (option) {
+                option.state = {
+                    opened: true,
+                    selected: $scope.ctrl.ngModel[$scope.controlName] &&
+                        $scope.ctrl.ngModel[$scope.controlName].indexOf(option.id) > -1
+                };
+            });
+
+            $element.find('.tree-view').jstree({
+                plugins: ['checkbox', 'types'],
+                core: {
+                    themes: { responsive: false },
+                    dblclick_toggle: false,
+                    data: $scope.controlGeneralOptions.options
+                },
+                checkbox: {
+                    three_state: false,
+                    keep_selected_style: false,
+                    cascade: '',
+                },
+                types: {
+                    'default': { 'icon': 'fa fa-folder icon-state-warning icon-lg' },
+                    'file': { 'icon': 'fa fa-file icon-state-warning icon-lg' }
+                }
+            }).bind('select_node.jstree', function (e, data) {
+                if (data.event) {
+                    data.instance.select_node(data.node.parents);
+
+                    $scope.ctrl.ngModel[$scope.controlName].push(data.node.id);
+                    angular.forEach(data.node.parents, function (pid) {
+                        pid !== '#' &&
+                        $scope.ctrl.ngModel[$scope.controlName].indexOf(pid) === -1 &&
+                        $scope.ctrl.ngModel[$scope.controlName].push(pid);
+                    });
+
+                    $scope.controlSetTouched();
+                    $scope.$apply();
+                }
+            }).bind('deselect_node.jstree', function (e, data) {
+                if (data.event) {
+                    data.instance.deselect_node(data.node.children_d);
+
+                    var removeIdxs = [];
+                    angular.forEach($scope.ctrl.ngModel[$scope.controlName], function (id, index) {
+                        if (data.selected.indexOf(id) === -1) {
+                            removeIdxs.push(index);
+                        }
+                    });
+
+                    for (var i = 0; i < removeIdxs.length; i++) {
+                        $scope.ctrl.ngModel[$scope.controlName].splice(removeIdxs[i] - i, 1);
+                    }
+
+                    $scope.controlSetTouched();
+                    $scope.$apply();
+                }
+            });
+
+            // Todo: change this function
+            $scope.$watch('ctrl.ngModel[controlName]', function (newValue) {
+                console.log(newValue);
+                if (newValue) {
+                    $element.find('.tree-view').jstree(true).deselect_all();
+                    $element.find('.tree-view').jstree(true).select_node(newValue);
+                } else {
+                    $scope.ctrl.ngModel[$scope.controlName] = [];
+                }
+            });
+        }
+    };
+}]);
+
 angular.module('angular.form.tpls', [
     'fwv/template/form/area.html',
     'fwv/template/form/control.html',
@@ -538,6 +625,7 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/radio.html',
     'fwv/template/form/checkbox.html',
     'fwv/template/form/checkbox-list.html',
+    'fwv/template/form/tree-view.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -566,6 +654,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-radio ng-if=\"controlRadio\"></form-radio>\n' +
         '       <form-checkbox ng-if=\"controlCheckbox\"></form-checkbox>\n' +
         '       <form-checkbox-list ng-if=\"controlCheckboxList\"></form-checkbox-list>\n' +
+        '       <form-tree-view ng-if=\"controlTreeView\"></form-tree-view>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -702,6 +791,15 @@ angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache'
         '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"hidden\"\n' +
         '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '           ng-required=\"controlRequired\"\n />\n' +
+        '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/tree-view.html',
+        '<div class=\"margin-top-10\">\n' +
+        '    <div class=\"tree-view\"></div>\n' +
+        '    <input type=\"text\" name=\"{{controlName}}\" ng-model=\"ctrl.ngModel[controlName]\" class=\"hidden\" />\n' +
         '</div>\n' +
         '');
 }]);
