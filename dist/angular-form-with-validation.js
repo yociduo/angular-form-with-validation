@@ -326,7 +326,8 @@ angular.module('angular.form.control', [])
             switch ($scope.controlType) {
                 case 'static': $scope.controlStatic = true; break;
                 case 'input': $scope.controlInput = true; break;
-                case 'inputGroup': $scope.controlInputGroup = true; break;
+                case 'password': $scope.controlInput = true; $scope.controlInputType = 'password'; break;
+                case 'input-group': $scope.controlInputGroup = true; break;
                 case 'textarea': $scope.controlTextArea = true;
                     if (optionsUsed) {
                         $scope.controlRows = $scope.controlOptions.controlRows || handpickFormConfig.options.controlRows;
@@ -335,7 +336,7 @@ angular.module('angular.form.control', [])
                     }
                     break;
                 case 'select': $scope.controlSelect = true; break;
-                case 'mutipleSelect': $scope.controlMutipleSelect = true; break;
+                case 'mutiple-select': $scope.controlMutipleSelect = true; break;
                 case 'radio': $scope.controlRadio = true; break;
                 case 'checkbox': $scope.controlCheckbox = true;
                     if (optionsUsed) {
@@ -344,18 +345,20 @@ angular.module('angular.form.control', [])
                         $scope.controlCheckboxLabel = $attrs.controlCheckboxLabel || angularFormConfig.options.controlCheckboxLabel;
                     }
                     break;
-                case 'checkboxList': $scope.controlCheckboxList = true; break;
-                case 'tagsInput': $scope.controlTagsInput = true; break;
-                case 'datePicker': $scope.controlDatePicker = true; break;
-                case 'dateRange': $scope.controlDateRange = true; break;
-                case 'timePicker': $scope.controlTimePicker = true; break;
-                case 'rangeSlider': $scope.controlRangeSlider = true; break;
-                case 'autoComplete': $scope.controlAutoComplete = true; break;
-                case 'treeView': $scope.controlTreeView = true; break;
+                case 'checkbox-list': $scope.controlCheckboxList = true; break;
+                case 'tags-input': $scope.controlTagsInput = true; break;
+                case 'date-picker': $scope.controlDatePicker = true; break;
+                case 'date-range': $scope.controlDateRange = true; break;
+                case 'time-picker': $scope.controlTimePicker = true; break;
+                case 'range-slider': $scope.controlRangeSlider = true; break;
+                case 'auto-complete': $scope.controlAutoComplete = true; break;
+                case 'tree-view': $scope.controlTreeView = true; break;
                 case 'input-tags': $scope.controlInputTags = true; break;
-                case 'richText': $scope.controlRichText = true; break;
-                case 'fileUpload': $scope.controlFileUpload = true; break;
-                case 'fileUploadAndCrop': $scope.controlFileUploadAndCrop = true; break;
+                case 'rich-text': $scope.controlRichText = true; break;
+                case 'file-upload': $scope.controlFileUpload = true; break;
+                case 'file-upload-and-crop': $scope.controlFileUploadAndCrop = true; break;
+                case 'hidden-key': 
+                default: $scope.controlHidden = true; break;
             }
         }
     };
@@ -542,7 +545,7 @@ angular.module('fwv/template/form/area.html', []).run(['$templateCache', functio
 
 angular.module('fwv/template/form/control.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/control.html',
-        '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\">\n' +
+        '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\" ng-hide=\"controlHidden\">\n' +
         '   <label class=\"control-label\" ng-class=\"controlLabelClass\">{{ controlLabel }}</label>\n' +
         '   <div ng-class=\"controlClass\">\n' +
         '       <form-static ng-if=\"controlStatic\"></form-static>\n' +
@@ -648,7 +651,7 @@ angular.module('fwv/template/form/radio.html', []).run(['$templateCache', functi
         '<div ng-class=\"controlGeneralOptions.listClass\">\n' +
         '    <label ng-repeat=\"option in controlGeneralOptions.options\"' +
         '           ng-class=\"controlGeneralOptions.itemClass\">\n' +
-        '       <input type=\"radio\" name=\"{{ controlName }}\"\n' +
+        '       <input type=\"radio\" name=\"{{controlName}}_{{$index}}\"\n' +
         '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
         '              ng-readonly=\"controlReadonly\"\n' +
@@ -664,7 +667,7 @@ angular.module('fwv/template/form/checkbox.html', []).run(['$templateCache', fun
         '<div>\n' +
         '    <label class=\"checkbox-inline\">\n' +
         '       <input type=\"checkbox\" name=\"{{ controlName }}\"\n' +
-        '              ng-model=\"ctrl.ngModel[controlName]\"\n' + 
+        '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
         '              ng-readonly=\"controlReadonly\"\n /> {{controlCheckboxLabel}}\n' +
         '    </label>\n' +
@@ -677,7 +680,7 @@ angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache'
         '<div ng-class=\"controlGeneralOptions.listClass\">\n' +
         '    <label ng-repeat=\"option in controlGeneralOptions.options\"' +
         '           ng-class=\"controlGeneralOptions.itemClass\">\n' +
-        '       <input type=\"checkbox\" name=\"{{ controlName }}\"\n' +
+        '       <input type=\"checkbox\" name=\"{{controlName}}_{{$index}}\"\n' +
         '              checklist-model=\"ctrl.ngModel[controlName]\"\n' +
         '              checklist-value=\"option.value\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +

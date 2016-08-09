@@ -25,12 +25,14 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
         formControlClass: 'col-md-6',
         formControlLabelClass: 'col-md-3',
         formControls: [
+            { controlType: 'hidden-key', controlName: 'hidden' },
             { controlType: 'static', controlName: 'staticControl', controlLabel: 'Static Control' },
             { controlType: 'input', controlName: 'input', controlLabel: 'Input', controlPlaceholder: 'placeholder...' },
+            { controlType: 'password', controlName: 'password', controlLabel: 'Password', controlPlaceholder: 'password...' },
             { controlType: 'input', controlName: 'disabled', controlLabel: 'Disabled', controlDisabled: true },
             { controlType: 'input', controlName: 'readonly', controlLabel: 'Readonly', controlReadonly: false },
             {
-                controlType: 'inputGroup', controlName: 'inputGroup', controlLabel: 'Input Group', controlGeneralOptions: {
+                controlType: 'input-group', controlName: 'inputGroup', controlLabel: 'Input Group', controlGeneralOptions: {
                     before: { type: 'addon', html: '<i class=\"glyphicon glyphicon-user\"></i>' },
                     after: { type: 'btn', html: '<button type=\"button\" class=\"btn btn-default\">Action</button>' }
                 }
@@ -48,7 +50,7 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
                 }
             },
             {
-                controlType: 'mutipleSelect', controlName: 'mutipleSelect', controlLabel: 'Mutiple Select', controlGeneralOptions: {
+                controlType: 'mutiple-select', controlName: 'mutipleSelect', controlLabel: 'Mutiple Select', controlGeneralOptions: {
                     options: [
                         { key: 'Options 1', value: 1 },
                         { key: 'Options 2', value: 2 },
@@ -71,7 +73,7 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
             },
             { controlType: 'checkbox', controlName: 'checkbox', controlLabel: 'Checkbox', controlCheckLabel: 'Test Options' },
             {
-                controlType: 'checkboxList', controlName: 'checkboxes', controlLabel: 'Checkbox List', controlGeneralOptions: {
+                controlType: 'checkbox-list', controlName: 'checkboxes', controlLabel: 'Checkbox List', controlGeneralOptions: {
                     options: [
                         { key: 'Options 1', value: 1 },
                         { key: 'Options 2', value: 2 },
