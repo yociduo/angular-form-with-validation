@@ -357,8 +357,17 @@ angular.module('angular.form.control', [])
                 case 'rich-text': $scope.controlRichText = true; break;
                 case 'file-upload': $scope.controlFileUpload = true; break;
                 case 'file-upload-and-crop': $scope.controlFileUploadAndCrop = true; break;
-                case 'hidden-key': 
+                case 'hidden-key':
                 default: $scope.controlHidden = true; break;
+            }
+
+            // set current control touched
+            $scope.controlSetTouched = function () {
+                if (ctrl.formValidation && $scope.controlGeneralOptions) {
+                    angular.forEach($scope.controlGeneralOptions.options, function (option, $index) {
+                        ctrl.formValidation[$scope.controlName].$setTouched();
+                    });
+                }
             }
         }
     };
@@ -655,9 +664,12 @@ angular.module('fwv/template/form/radio.html', []).run(['$templateCache', functi
         '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
         '              ng-readonly=\"controlReadonly\"\n' +
-        '              ng-required=\"controlRequired\"\n' +
+        '              ng-change=\"controlSetTouched()\"\n' +
         '              ng-value=\"{{option.value}}\" /> {{option.key}}\n' +
         '    </label>\n' +
+        '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"hidden\"\n' +
+        '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '           ng-required=\"controlRequired\"\n />\n' +
         '</div>\n' +
         '');
 }]);
@@ -684,8 +696,12 @@ angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache'
         '              checklist-model=\"ctrl.ngModel[controlName]\"\n' +
         '              checklist-value=\"option.value\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
-        '              ng-readonly=\"controlReadonly\" /> {{option.key}}\n' +
+        '              ng-readonly=\"controlReadonly\"\n' +
+        '              ng-change=\"controlSetTouched()\"/> {{option.key}}\n' +
         '    </label>\n' +
+        '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"hidden\"\n' +
+        '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '           ng-required=\"controlRequired\"\n />\n' +
         '</div>\n' +
         '');
 }]);
