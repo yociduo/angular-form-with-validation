@@ -18,7 +18,7 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
         checkbox: true,
         checkboxes: [1, 2],
         treeView: [1, 2],
-        tagsInput: ['Tag1', 'Tag2']
+        tags: ['Tag1', 'Tag2']
     };
 
     $scope.formOptions = {
@@ -98,7 +98,7 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
                     ]
                 }
             },
-            { controlType: 'tags-input', controlName: 'tagsInput', controlLabel: 'Tags Input' }
+            { controlType: 'tags', controlName: 'tags', controlLabel: 'Tags' }
         ]
     };
 

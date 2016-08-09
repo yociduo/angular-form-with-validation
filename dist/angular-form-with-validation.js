@@ -29,7 +29,7 @@ angular.module('angular.form.constant', [])
         formCheckbox: 'fwv/template/form/checkbox.html',
         formCheckboxList: 'fwv/template/form/checkbox-list.html',
         formTreeView: 'fwv/template/form/tree-view.html',
-        formTagsInput: 'fwv/template/form/tags-input.html',
+        formTags: 'fwv/template/form/tags.html',
     },
     options: {
         disableValidation: false,
@@ -357,14 +357,13 @@ angular.module('angular.form.control', [])
                     }
                     break;
                 case 'checkbox-list': $scope.controlCheckboxList = true; break;
-                case 'tags-input': $scope.controlTagsInput = true; break;
+                case 'tags': $scope.controlTags = true; break;
                 case 'date-picker': $scope.controlDatePicker = true; break;
                 case 'date-range': $scope.controlDateRange = true; break;
                 case 'time-picker': $scope.controlTimePicker = true; break;
                 case 'range-slider': $scope.controlRangeSlider = true; break;
                 case 'auto-complete': $scope.controlAutoComplete = true; break;
                 case 'tree-view': $scope.controlTreeView = true; break;
-                case 'input-tags': $scope.controlInputTags = true; break;
                 case 'rich-text': $scope.controlRichText = true; break;
                 case 'file-upload': $scope.controlFileUpload = true; break;
                 case 'file-upload-and-crop': $scope.controlFileUploadAndCrop = true; break;
@@ -407,7 +406,7 @@ angular.module('angular.form.controls', [
     'angular.form.controls.checkbox',
     'angular.form.controls.checkbox-list',
     'angular.form.controls.tree-view',
-    'angular.form.controls.tags-input',
+    'angular.form.controls.tags',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -622,13 +621,14 @@ angular.module('angular.form.controls.tree-view', [])
     };
 }]);
 
-angular.module('angular.form.controls.tags-input', [])
-.directive('formTagsInput', ['angularFormConfig', '$timeout', function (angularFormConfig, $timeout) {
+// Todo: fix empty throw exception issue
+angular.module('angular.form.controls.tags', [])
+.directive('formTags', ['angularFormConfig', '$timeout', function (angularFormConfig, $timeout) {
     return {
         require: '^formControl',
         restric: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || angularFormConfig.templateUrl.formTagsInput;
+            return attrs.templateUrl || angularFormConfig.templateUrl.formTags;
         },
         replace: false,
         transclude: false,
@@ -672,7 +672,7 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/checkbox.html',
     'fwv/template/form/checkbox-list.html',
     'fwv/template/form/tree-view.html',
-    'fwv/template/form/tags-input.html',
+    'fwv/template/form/tags.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -702,7 +702,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-checkbox ng-if=\"controlCheckbox\"></form-checkbox>\n' +
         '       <form-checkbox-list ng-if=\"controlCheckboxList\"></form-checkbox-list>\n' +
         '       <form-tree-view ng-if=\"controlTreeView\"></form-tree-view>\n' +
-        '       <form-tags-input ng-if=\"controlTagsInput\"></form-tags-input>\n' +
+        '       <form-tags ng-if=\"controlTags\"></form-tags>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -852,8 +852,8 @@ angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', fu
         '');
 }]);
 
-angular.module('fwv/template/form/tags-input.html', []).run(['$templateCache', function ($templateCache) {
-    $templateCache.put('fwv/template/form/tags-input.html',
+angular.module('fwv/template/form/tags.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/tags.html',
         '<bootstrap-tagsinput name=\"{{controlName}}\" class=\"full-width\"\n' +
         '                     tagclass=\"{{controlTagClass}}\"\n' +
         '                     ng-model=\"ctrl.ngModel[controlName]\">\n' +

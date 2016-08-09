@@ -24,7 +24,7 @@ app.controller('DemoCtrl', function ($scope) {
         checkbox: true,
         checkboxes: [1, 2],
         treeView: [1, 2],
-        tagsInput: ['Tag1', 'Tag2']
+        tags: ['Tag1', 'Tag2']
     };
 
     $scope.groupOptions = {
