@@ -618,6 +618,7 @@ angular.module('angular.form.controls.tags', [])
     };
 }]);
 
+// Todo: add validation and options
 angular.module('angular.form.controls.date-picker', [])
 .directive('formDatePicker', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -628,7 +629,20 @@ angular.module('angular.form.controls.date-picker', [])
         },
         replace: true,
         transclude: true,
-        link: function ($scope, $element, $attrs) { }
+        link: function ($scope, $element, $attrs) {
+            if (!$.fn.datepicker) { return; }
+
+            $element.datepicker({
+                clearBtn: true,
+                autoclose: true,
+                todayHighlight: true,
+                format: 'yyyy/mm/dd'
+            });
+
+            $scope.$watch('ctrl.ngModel[controlName]', function (newValue) {
+                $element.datepicker('update', newValue);
+            });
+        }
     };
 }]);
 
@@ -859,7 +873,7 @@ angular.module('fwv/template/form/area.html', []).run(['$templateCache', functio
 angular.module('fwv/template/form/control.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/control.html',
         '<div class=\"form-group\" ng-class=\"ctrl.formValidation[controlName] | formGroupValidation\" ng-hide=\"controlHidden\">\n' +
-        '   <label class=\"control-label\" ng-class=\"controlLabelClass\">{{ controlLabel }}</label>\n' +
+        '   <label class=\"control-label\" ng-class=\"controlLabelClass\">{{controlLabel}}</label>\n' +
         '   <div ng-class=\"controlClass\">\n' +
         '       <form-static ng-if=\"controlStatic\"></form-static>\n' +
         '       <form-input ng-if=\"controlInput\"></form-input>\n' +
@@ -874,7 +888,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-tags ng-if=\"controlTags\"></form-tags>\n' +
         '       <form-date-picker ng-if=\"controlDatePicker\"></form-date-picker>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
-        '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
+        '           {{(ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp}}\n' +
         '       </span>\n' +
         '   </div>\n' +
         '</div>\n' +
@@ -883,13 +897,13 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
 
 angular.module('fwv/template/form/static.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/static.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/input.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/input.html',
-        '<input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
+        '<input type=\"{{controlInputType}}\" name=\"{{controlName}}\" class=\"form-control\"\n' +
         '       ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '       placeholder=\"{{controlPlaceholder}}\"\n' +
         '       ng-disabled=\"controlDisabled\"\n' +
@@ -905,7 +919,7 @@ angular.module('fwv/template/form/input-group.html', []).run(['$templateCache', 
     $templateCache.put('fwv/template/form/input-group.html',
         '<div class=\"input-group\">\n' +
         '   <div ng-if=\"controlGeneralOptions.before\" class=\"input-group-{{controlGeneralOptions.before.type}}\" ng-bind-html=\"controlGeneralOptions.before.html|formHtml\"></div>\n' +
-        '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"form-control\"\n' +
+        '    <input type=\"{{controlInputType}}\" name=\"{{controlName}}\" class=\"form-control\"\n' +
         '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '           placeholder=\"{{controlPlaceholder}}\"\n' +
         '           ng-disabled=\"controlDisabled\"\n' +
@@ -974,7 +988,7 @@ angular.module('fwv/template/form/radio.html', []).run(['$templateCache', functi
         '              ng-change=\"controlSetTouched()\"\n' +
         '              ng-value=\"{{option.value}}\" /> {{option.key}}\n' +
         '    </label>\n' +
-        '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"hidden\"\n' +
+        '    <input type=\"{{controlInputType}}\" name=\"{{controlName}}\" class=\"hidden\"\n' +
         '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '           ng-required=\"controlRequired\"\n />\n' +
         '</div>\n' +
@@ -985,7 +999,7 @@ angular.module('fwv/template/form/checkbox.html', []).run(['$templateCache', fun
     $templateCache.put('fwv/template/form/checkbox.html',
         '<div>\n' +
         '    <label class=\"checkbox-inline\">\n' +
-        '       <input type=\"checkbox\" name=\"{{ controlName }}\"\n' +
+        '       <input type=\"checkbox\" name=\"{{controlName}}\"\n' +
         '              ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '              ng-disabled=\"controlDisabled\"\n' +
         '              ng-readonly=\"controlReadonly\"\n /> {{controlCheckboxLabel}}\n' +
@@ -1006,7 +1020,7 @@ angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache'
         '              ng-readonly=\"controlReadonly\"\n' +
         '              ng-change=\"controlSetTouched()\"/> {{option.key}}\n' +
         '    </label>\n' +
-        '    <input type=\"{{ controlInputType }}\" name=\"{{ controlName }}\" class=\"hidden\"\n' +
+        '    <input type=\"{{controlInputType}}\" name=\"{{controlName}}\" class=\"hidden\"\n' +
         '           ng-model=\"ctrl.ngModel[controlName]\"\n' +
         '           ng-required=\"controlRequired\"\n />\n' +
         '</div>\n' +
@@ -1024,13 +1038,19 @@ angular.module('fwv/template/form/tags.html', []).run(['$templateCache', functio
 
 angular.module('fwv/template/form/date-picker.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/date-picker.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<div class=\"input-group date\">\n' +
+        '    <input type=\"text\" name=\"{{controlName}}\" class=\"form-control\" readonly\n' +
+        '           ng-model=\"ctrl.ngModel[controlName]\" />\n' +
+        '    <span class=\"input-group-addon\">\n' +
+        '        <i class=\"glyphicon glyphicon-calendar\"></i>\n' +
+        '   </span>\n' +
+        '</div>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/time-picker.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/time-picker.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);
 
@@ -1056,13 +1076,13 @@ angular.module('fwv/template/form/datetime-picker.html', []).run(['$templateCach
 
 angular.module('fwv/template/form/date-range.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/date-range.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/auto-complete.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/auto-complete.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);
 
@@ -1077,18 +1097,18 @@ angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', fu
 
 angular.module('fwv/template/form/rich-text.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/rich-text.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/file-upload.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/file-upload.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);
 
 angular.module('fwv/template/form/file-upload-and-crop.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/file-upload-and-crop.html',
-        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
         '');
 }]);

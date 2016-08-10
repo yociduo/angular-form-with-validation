@@ -4,7 +4,7 @@
 var app = angular.module('demo', [
     'angular-form-with-validation',
     'checklist-model',
-    'bootstrap-tagsinput'
+    'bootstrap-tagsinput',
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
@@ -24,7 +24,8 @@ app.controller('DemoCtrl', function ($scope) {
         checkbox: true,
         checkboxes: [1, 2],
         treeView: [1, 2],
-        tags: ['Tag1', 'Tag2']
+        tags: ['Tag1', 'Tag2'],
+        datePicker: '2016-08-09T00:00:00.000',
     };
 
     $scope.groupOptions = {
