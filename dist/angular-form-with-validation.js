@@ -28,8 +28,16 @@ angular.module('angular.form.constant', [])
         formRadio: 'fwv/template/form/radio.html',
         formCheckbox: 'fwv/template/form/checkbox.html',
         formCheckboxList: 'fwv/template/form/checkbox-list.html',
-        formTreeView: 'fwv/template/form/tree-view.html',
         formTags: 'fwv/template/form/tags.html',
+        formDatePicker: 'fwv/template/form/date-picker.html',
+        formTimePicker: 'fwv/template/form/time-picker.html',
+        formDatetimePicker: 'fwv/template/form/datetime-picker.html',
+        formDateRange: 'fwv/template/form/date-range.html',
+        formAutoComplete: 'fwv/template/form/auto-complete.html',
+        formTreeView: 'fwv/template/form/tree-view.html',
+        formRichText: 'fwv/template/form/rich-text.html',
+        formFileUpload: 'fwv/template/form/file-upload.html',
+        formFileUploadAndCrop: 'fwv/template/form/file-upload-and-crop.html',
     },
     options: {
         disableValidation: false,
@@ -40,9 +48,22 @@ angular.module('angular.form.constant', [])
         controlInputType: 'text',
         controlRows: 4,
         controlGeneralOptions: {
-            options: [],
+            options: []
         },
         controlCheckboxLabel: 'Default',
+        controlRichTextOptions: {
+            height: 300,
+            placeholder: 'Please write here...',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['view', ['codeview']],
+            ]
+        },
+        controlJcropOptions: { p: { w: 150, h: 150 } },
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -218,6 +239,8 @@ angular.module('angular.form.control', [])
             controlDisabled: '=?',
             controlReadonly: '=?',
             controlGeneralOptions: '=?',
+            controlRichTextOptions: '=?',
+            controlJcropOptions: '=?',
         },
         transclude: true,
         controller: function () { },
@@ -364,9 +387,21 @@ angular.module('angular.form.control', [])
                 case 'range-slider': $scope.controlRangeSlider = true; break;
                 case 'auto-complete': $scope.controlAutoComplete = true; break;
                 case 'tree-view': $scope.controlTreeView = true; break;
-                case 'rich-text': $scope.controlRichText = true; break;
+                case 'rich-text': $scope.controlRichText = true;
+                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlRichTextOptions)) {
+                        $scope.controlRichTextOptions = $scope.controlOptions.controlRichTextOptions;
+                    } else {
+                        $scope.controlRichTextOptions = $scope.controlRichTextOptions || angularFormConfig.options.controlRichTextOptions;
+                    }
+                    break;
                 case 'file-upload': $scope.controlFileUpload = true; break;
-                case 'file-upload-and-crop': $scope.controlFileUploadAndCrop = true; break;
+                case 'file-upload-and-crop': $scope.controlFileUploadAndCrop = true;
+                    if (optionsUsed && angular.isDefined($scope.controlOptions.controlJcropOptions)) {
+                        $scope.controlJcropOptions = $scope.controlOptions.controlJcropOptions;
+                    } else {
+                        $scope.controlJcropOptions = $scope.controlJcropOptions || angularFormConfig.options.controlJcropOptions;
+                    }
+                    break;
                 case 'hidden-key':
                 default: $scope.controlHidden = true; break;
             }
@@ -405,8 +440,16 @@ angular.module('angular.form.controls', [
     'angular.form.controls.radio',
     'angular.form.controls.checkbox',
     'angular.form.controls.checkbox-list',
-    'angular.form.controls.tree-view',
     'angular.form.controls.tags',
+    'angular.form.controls.date-picker',
+    'angular.form.controls.datetime-picker',
+    'angular.form.controls.time-picker',
+    'angular.form.controls.date-range',
+    'angular.form.controls.auto-complete',
+    'angular.form.controls.tree-view',
+    'angular.form.controls.rich-text',
+    'angular.form.controls.file-upload',
+    'angular.form.controls.file-upload-and-crop',
 ]);
 
 angular.module('angular.form.controls.static', [])
@@ -537,6 +580,120 @@ angular.module('angular.form.controls.checkbox-list', [])
     };
 }]);
 
+// Todo: fix empty throw exception issue
+angular.module('angular.form.controls.tags', [])
+.directive('formTags', ['angularFormConfig', '$timeout', function (angularFormConfig, $timeout) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formTags;
+        },
+        replace: false,
+        transclude: false,
+        link: function ($scope, $element, $attrs) {
+            var ctrl = $scope.$parent.ctrl,
+                tagsinput = $element.find('select');
+
+            $scope.init = false;
+
+            tagsinput.on('itemAdded', function (event) {
+                if ($scope.init) {
+                    $scope.controlSetTouched();
+                    $scope.$apply();
+                }
+            });
+
+            tagsinput.on('itemRemoved', function (event) {
+                if ($scope.init) {
+                    $scope.controlSetTouched();
+                    $scope.$apply();
+                }
+            });
+
+            $timeout(function () {
+                $scope.init = true;
+            });
+        }
+    };
+}]);
+
+angular.module('angular.form.controls.date-picker', [])
+.directive('formDatePicker', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formDatePicker;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
+angular.module('angular.form.controls.time-picker', [])
+.directive('formTimePicker', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formTimePicker;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
+angular.module('angular.form.controls.datetime-picker', [])
+.directive('formDatetimePicker', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formDatetimePicker;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) {
+            $scope.controlDatetimeOptions = {
+                dropdownSelector: '#dropdown2',
+                startView: 'year',
+                minView: 'day',
+            }
+        }
+    };
+}]);
+
+angular.module('angular.form.controls.date-range', [])
+.directive('formDateRange', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formDateRange;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
+angular.module('angular.form.controls.auto-complete', [])
+.directive('formAutoComplete', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formAutoComplete;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
+
 angular.module('angular.form.controls.tree-view', [])
 .directive('formTreeView', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -621,41 +778,45 @@ angular.module('angular.form.controls.tree-view', [])
     };
 }]);
 
-// Todo: fix empty throw exception issue
-angular.module('angular.form.controls.tags', [])
-.directive('formTags', ['angularFormConfig', '$timeout', function (angularFormConfig, $timeout) {
+angular.module('angular.form.controls.rich-text', [])
+.directive('formRichText', ['angularFormConfig', function (angularFormConfig) {
     return {
         require: '^formControl',
         restric: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || angularFormConfig.templateUrl.formTags;
+            return attrs.templateUrl || angularFormConfig.templateUrl.formRichText;
         },
-        replace: false,
-        transclude: false,
-        link: function ($scope, $element, $attrs) {
-            var ctrl = $scope.$parent.ctrl,
-                tagsinput = $element.find('select');
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
 
-            $scope.init = false;
+angular.module('angular.form.controls.file-upload', [])
+.directive('formFileUpload', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.formFileUpload;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
+    };
+}]);
 
-            tagsinput.on('itemAdded', function (event) {
-                if ($scope.init) {
-                    $scope.controlSetTouched();
-                    $scope.$apply();
-                }
-            });
-
-            tagsinput.on('itemRemoved', function (event) {
-                if ($scope.init) {
-                    $scope.controlSetTouched();
-                    $scope.$apply();
-                }
-            });
-
-            $timeout(function () {
-                $scope.init = true;
-            });
-        }
+angular.module('angular.form.controls.file-upload-and-crop', [])
+.directive('formFileUploadAndCrop', ['angularFormConfig', function (angularFormConfig) {
+    return {
+        require: '^formControl',
+        restric: 'E',
+        templateUrl: function (element, attrs) {
+            return attrs.templateUrl || angularFormConfig.templateUrl.controlFileUploadAndCrop;
+        },
+        replace: true,
+        transclude: true,
+        link: function ($scope, $element, $attrs) { }
     };
 }]);
 
@@ -671,8 +832,16 @@ angular.module('angular.form.tpls', [
     'fwv/template/form/radio.html',
     'fwv/template/form/checkbox.html',
     'fwv/template/form/checkbox-list.html',
-    'fwv/template/form/tree-view.html',
     'fwv/template/form/tags.html',
+    'fwv/template/form/date-picker.html',
+    'fwv/template/form/time-picker.html',
+    'fwv/template/form/datetime-picker.html',
+    'fwv/template/form/date-range.html',
+    'fwv/template/form/auto-complete.html',
+    'fwv/template/form/tree-view.html',
+    'fwv/template/form/rich-text.html',
+    'fwv/template/form/file-upload.html',
+    'fwv/template/form/file-upload-and-crop.html',
 ]);
 
 angular.module('fwv/template/form/area.html', []).run(['$templateCache', function ($templateCache) {
@@ -703,6 +872,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-checkbox-list ng-if=\"controlCheckboxList\"></form-checkbox-list>\n' +
         '       <form-tree-view ng-if=\"controlTreeView\"></form-tree-view>\n' +
         '       <form-tags ng-if=\"controlTags\"></form-tags>\n' +
+        '       <form-date-picker ng-if=\"controlDatePicker\"></form-date-picker>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{ (ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp }}\n' +
         '       </span>\n' +
@@ -843,6 +1013,59 @@ angular.module('fwv/template/form/checkbox-list.html', []).run(['$templateCache'
         '');
 }]);
 
+angular.module('fwv/template/form/tags.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/tags.html',
+        '<bootstrap-tagsinput name=\"{{controlName}}\" class=\"full-width\"\n' +
+        '                     tagclass=\"{{controlTagClass}}\"\n' +
+        '                     ng-model=\"ctrl.ngModel[controlName]\">\n' +
+        '</bootstrap-tagsinput>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/date-picker.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/date-picker.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/time-picker.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/time-picker.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/datetime-picker.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/datetime-picker.html',
+        '<div class=\"dropdown\">\n' +
+        '    <a class=\"dropdown-toggle\" id=\"dropdown2\" role=\"button\" data-toggle=\"dropdown\" data-target=\"#\" href=\"#\">\n' +
+        '        <div class=\"input-group\">\n' +
+        '            <input type=\"text\" name=\"{{controlName}}\" class=\"form-control\"\n' +
+        '                   ng-model=\"ctrl.ngModel[controlName]\">\n' +
+        '            <span class=\"input-group-addon\">\n' +
+        '                <i class=\"glyphicon glyphicon-calendar\"></i>\n' +
+        '            </span>\n' +
+        '        </div>\n' +
+        '    </a>\n' +
+        '    <ul class=\"dropdown-menu\" role=\"menu\" aria-labelledby=\"dLabel\">\n' +
+        '        <datetimepicker ng-model=\"ctrl.ngModel[controlName]\"\n' +
+        '                        data-datetimepicker-config=\"controlDatetimeOptions\" /> \n' +
+        '    </ul>\n' +
+        '</div>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/date-range.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/date-range.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/auto-complete.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/auto-complete.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '');
+}]);
+
 angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/tree-view.html',
         '<div class=\"margin-top-10\">\n' +
@@ -852,11 +1075,20 @@ angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', fu
         '');
 }]);
 
-angular.module('fwv/template/form/tags.html', []).run(['$templateCache', function ($templateCache) {
-    $templateCache.put('fwv/template/form/tags.html',
-        '<bootstrap-tagsinput name=\"{{controlName}}\" class=\"full-width\"\n' +
-        '                     tagclass=\"{{controlTagClass}}\"\n' +
-        '                     ng-model=\"ctrl.ngModel[controlName]\">\n' +
-        '</bootstrap-tagsinput>\n' +
+angular.module('fwv/template/form/rich-text.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/rich-text.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/file-upload.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/file-upload.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
+        '');
+}]);
+
+angular.module('fwv/template/form/file-upload-and-crop.html', []).run(['$templateCache', function ($templateCache) {
+    $templateCache.put('fwv/template/form/file-upload-and-crop.html',
+        '<p class=\"form-control-static\"> {{ ctrl.ngModel[controlName] }} </p>\n' +
         '');
 }]);
