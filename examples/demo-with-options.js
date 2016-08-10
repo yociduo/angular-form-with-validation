@@ -4,7 +4,8 @@
 var app = angular.module('demo', [
     'angular-form-with-validation',
     'checklist-model',
-    'bootstrap-tagsinput'
+    'bootstrap-tagsinput',
+    'summernote',
 ]);
 
 app.controller('DemoWithOptionsCtrl', function ($scope) {
@@ -18,7 +19,9 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
         checkbox: true,
         checkboxes: [1, 2],
         treeView: [1, 2],
-        tags: ['Tag1', 'Tag2']
+        tags: ['Tag1', 'Tag2'],
+        datePicker: '2016-08-09T00:00:00.000',
+        richText: '<h1>Rich Text</h1>',
     };
 
     $scope.formOptions = {
@@ -98,7 +101,9 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
                     ]
                 }
             },
-            { controlType: 'tags', controlName: 'tags', controlLabel: 'Tags' }
+            { controlType: 'tags', controlName: 'tags', controlLabel: 'Tags' },
+            { controlType: 'date-picker', controlName: 'datePicker', controlLabel: 'Date Picker' },
+            { controlType: 'rich-text', controlName: 'richText', controlLabel: 'Rich Text' }
         ]
     };
 

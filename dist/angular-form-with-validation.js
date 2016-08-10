@@ -646,6 +646,7 @@ angular.module('angular.form.controls.date-picker', [])
     };
 }]);
 
+// Todo: complete this form control
 angular.module('angular.form.controls.time-picker', [])
 .directive('formTimePicker', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -660,6 +661,7 @@ angular.module('angular.form.controls.time-picker', [])
     };
 }]);
 
+// Todo: complete this form control
 angular.module('angular.form.controls.datetime-picker', [])
 .directive('formDatetimePicker', ['angularFormConfig', function (angularFormConfig) {
     return {
@@ -887,6 +889,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-tree-view ng-if=\"controlTreeView\"></form-tree-view>\n' +
         '       <form-tags ng-if=\"controlTags\"></form-tags>\n' +
         '       <form-date-picker ng-if=\"controlDatePicker\"></form-date-picker>\n' +
+        '       <form-rich-text ng-if=\"controlRichText\"></form-rich-text>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{(ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp}}\n' +
         '       </span>\n' +
@@ -1097,7 +1100,9 @@ angular.module('fwv/template/form/tree-view.html', []).run(['$templateCache', fu
 
 angular.module('fwv/template/form/rich-text.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/rich-text.html',
-        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
+        '<div>\n' +
+        '   <summernote name=\"{{controlName}}\" ng-model=\"ctrl.ngModel[controlName]\" config=\"controlRichTextOptions\"></summernote>\n' +
+        '</div>' +
         '');
 }]);
 

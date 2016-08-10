@@ -5,6 +5,7 @@ var app = angular.module('demo', [
     'angular-form-with-validation',
     'checklist-model',
     'bootstrap-tagsinput',
+    'summernote',
 ]);
 
 app.controller('DemoCtrl', function ($scope) {
@@ -26,6 +27,7 @@ app.controller('DemoCtrl', function ($scope) {
         treeView: [1, 2],
         tags: ['Tag1', 'Tag2'],
         datePicker: '2016-08-09T00:00:00.000',
+        richText: '<h1>Rich Text</h1>',
     };
 
     $scope.groupOptions = {
