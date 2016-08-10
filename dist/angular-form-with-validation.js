@@ -364,7 +364,7 @@ angular.module('angular.form.control', [])
                 case 'input-group': $scope.controlInputGroup = true; break;
                 case 'textarea': $scope.controlTextArea = true;
                     if (optionsUsed) {
-                        $scope.controlRows = $scope.controlOptions.controlRows || handpickFormConfig.options.controlRows;
+                        $scope.controlRows = $scope.controlOptions.controlRows || angularFormConfig.options.controlRows;
                     } else {
                         $scope.controlRows = $attrs.controlRows || angularFormConfig.options.controlRows;
                     }
@@ -808,8 +808,9 @@ angular.module('angular.form.controls.rich-text', [])
     };
 }]);
 
+// Todo: set options and validation
 angular.module('angular.form.controls.file-upload', [])
-.directive('formFileUpload', ['angularFormConfig', function (angularFormConfig) {
+.directive('formFileUpload', ['angularFormConfig', '$http', function (angularFormConfig, $http) {
     return {
         require: '^formControl',
         restric: 'E',
@@ -818,7 +819,63 @@ angular.module('angular.form.controls.file-upload', [])
         },
         replace: true,
         transclude: true,
-        link: function ($scope, $element, $attrs) { }
+        link: function ($scope, $element, $attrs) {
+            var ctrl = $scope.$parent.ctrl;
+
+            $element.on('change.bs.fileinput', function (e, file) {
+                e.stopPropagation();
+
+                var allowTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+                if (!file || allowTypes.indexOf(file.type) == -1) {
+                    if (!ctrl.formValidation ||
+                        !ctrl.formValidation[$scope.controlName].$error['uploading-file'] ||
+                        !ctrl.formValidation[$scope.controlName].$error['cropping-image']) {
+                        $element.fileinput('reset');
+                    }
+                    return;
+                }
+
+                if (ctrl.formValidation) {
+                    ctrl.formValidation.$setDirty();
+                    ctrl.formValidation[$scope.controlName].$setTouched();
+                    ctrl.formValidation[$scope.controlName].$setValidity('uploading-file', false);
+                }
+
+                var fd = new FormData();
+                fd.append('file', file);
+                $http.post('http://image.local.handpick.us/api/asset/uploadfile', fd, {
+                    withCredentials: false,
+                    headers: {
+                        'Content-Type': undefined
+                    },
+                    transformRequest: angular.identity,
+                    params: fd
+                }).success(function (data) {
+                    if (data.success) {
+                        ctrl.ngModel[$scope.controlName] = data.result.path;
+                    } else {
+                        $element.fileinput('reset');
+                    }
+                }).error(function () {
+                    $element.fileinput('reset');
+                }).finally(function () {
+                    if (ctrl.formValidation) {
+                        ctrl.formValidation[$scope.controlName].$setValidity('uploading-file', true);
+                    }
+                });
+            });
+
+            $element.on('clear.bs.fileinput', function (e) {
+                ctrl.ngModel[$scope.controlName] = '';
+
+                if (ctrl.formValidation) {
+                    ctrl.formValidation.$setDirty();
+                    ctrl.formValidation[$scope.controlName].$setTouched();
+                }
+
+                $scope.$apply();
+            });
+        }
     };
 }]);
 
@@ -890,6 +947,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-tags ng-if=\"controlTags\"></form-tags>\n' +
         '       <form-date-picker ng-if=\"controlDatePicker\"></form-date-picker>\n' +
         '       <form-rich-text ng-if=\"controlRichText\"></form-rich-text>\n' +
+        '       <form-file-upload ng-if=\"controlFileUpload\"></form-file-upload>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{(ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp}}\n' +
         '       </span>\n' +
@@ -1108,7 +1166,23 @@ angular.module('fwv/template/form/rich-text.html', []).run(['$templateCache', fu
 
 angular.module('fwv/template/form/file-upload.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/file-upload.html',
-        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
+        '<div class=\"fileinput\" ng-class=\"ctrl.ngModel[controlName].length > 0 ? \'fileinput-exists\' : \'fileinput-new\'\" data-provides=\"fileinput\">\n' +
+        '   <div class=\"fileinput-new thumbnail\" data-trigger=\"fileinput\" style=\"width: 200px; height: 150px;\">\n' +
+        '       <img />\n' +
+        '   </div>\n' +
+        '   <div class=\"fileinput-preview fileinput-exists thumbnail\" style=\"max-width: 200px; max-height: 150px;\">\n' +
+        '       <img ng-if=\"ctrl.ngModel[controlName].length > 0\"\n' +
+        '            ng-src=\"http://image.local.handpick.us/uploadfiles/{{ctrl.ngModel[controlName]}}?preset=m\" style=\"max-height: 140px;\" />\n' +
+        '   </div>\n' +
+        '   <div>\n' +
+        '       <span class=\"btn btn-default btn-file\">\n' +
+        '           <span class=\"fileinput-new\"> Select image </span>\n' +
+        '           <span class=\"fileinput-exists\"> Change </span>\n' +
+        '           <input type=\"file\" name=\"{{controlName}}\" ng-model=\"ctrl.ngModel[controlName]\" ng-required=\"controlRequired\">\n' +
+        '       </span>\n' +
+        '       <a href=\"#\" class=\"btn btn-danger fileinput-exists\" data-dismiss=\"fileinput\"> Remove </a>\n' +
+        '   </div>\n' +
+        '</div>\n' +
         '');
 }]);
 

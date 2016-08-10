@@ -103,7 +103,8 @@ app.controller('DemoWithOptionsCtrl', function ($scope) {
             },
             { controlType: 'tags', controlName: 'tags', controlLabel: 'Tags' },
             { controlType: 'date-picker', controlName: 'datePicker', controlLabel: 'Date Picker' },
-            { controlType: 'rich-text', controlName: 'richText', controlLabel: 'Rich Text' }
+            { controlType: 'rich-text', controlName: 'richText', controlLabel: 'Rich Text' },
+            { controlType: 'file-upload', controlName: 'fileUpload', controlLabel: 'File Upload' }
         ]
     };
 
