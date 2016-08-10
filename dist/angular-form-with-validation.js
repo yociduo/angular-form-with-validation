@@ -63,7 +63,10 @@ angular.module('angular.form.constant', [])
                 ['view', ['codeview']],
             ]
         },
-        controlJcropOptions: { p: { w: 150, h: 150 } },
+        controlJcropOptions: {
+            p: { w: 150, h: 150 },
+            c: {},
+        },
     },
     errorMessage: {
         // Todo: Optimize to constant module
@@ -754,7 +757,9 @@ angular.module('angular.form.controls.tree-view', [])
                     $scope.ctrl.ngModel[$scope.controlName].push(data.node.id);
                     angular.forEach(data.node.parents, function (pid) {
                         pid !== '#' &&
-                        $scope.ctrl.ngModel[$scope.controlName].indexOf(pid) === -1 &&
+                        $.map($scope.ctrl.ngModel[$scope.controlName], function (value) {
+                            return value.toString();
+                        }).indexOf(pid.toString()) === -1 &&
                         $scope.ctrl.ngModel[$scope.controlName].push(pid);
                     });
 
@@ -767,7 +772,9 @@ angular.module('angular.form.controls.tree-view', [])
 
                     var removeIdxs = [];
                     angular.forEach($scope.ctrl.ngModel[$scope.controlName], function (id, index) {
-                        if (data.selected.indexOf(id) === -1) {
+                        if ($.map(data.selected, function (value) {
+                            return value.toString();
+                        }).indexOf(id.toString()) === -1) {
                             removeIdxs.push(index);
                         }
                     });
@@ -880,16 +887,185 @@ angular.module('angular.form.controls.file-upload', [])
 }]);
 
 angular.module('angular.form.controls.file-upload-and-crop', [])
-.directive('formFileUploadAndCrop', ['angularFormConfig', function (angularFormConfig) {
+.directive('formFileUploadAndCrop', ['angularFormConfig', '$http', '$timeout', function (angularFormConfig, $http, $timeout) {
     return {
         require: '^formControl',
         restric: 'E',
         templateUrl: function (element, attrs) {
-            return attrs.templateUrl || angularFormConfig.templateUrl.controlFileUploadAndCrop;
+            return attrs.templateUrl || angularFormConfig.templateUrl.formFileUploadAndCrop;
         },
         replace: true,
         transclude: true,
-        link: function ($scope, $element, $attrs) { }
+        link: function ($scope, $element, $attrs) {
+            var ctrl = $scope.$parent.ctrl,
+                jcrop_api,
+                options = $scope.$parent.controlJcropOptions,
+                boundx,
+                boundy,
+                xsize = options.p.w,
+                ysize = options.p.h,
+                $preview = $element.find('#preview-pane'),
+                $pcnt = $element.find('#preview-pane .preview-container'),
+                $pimg = $element.find('#preview-pane .preview-container img'),
+                $cropPreview = $element.find('#preview-pane .jcrop-preview'),
+                $crop = $element.find('#ProfilePictureResize');
+
+            $scope.crop = function () {
+                if (ctrl.ngModel[$scope.controlName] && options.c.w > 0) {
+                    if (ctrl.formValidation) {
+                        ctrl.formValidation.$setDirty();
+                        ctrl.formValidation[$scope.controlName].$setTouched();
+                        ctrl.formValidation[$scope.controlName].$setValidity('cropping-image', false);
+                    }
+
+                    $http({
+                        method: 'post',
+                        url: 'http://image.local.handpick.us/api/asset/cropimage',
+                        data: {
+                            referPath: ctrl.ngModel[$scope.controlName],
+                            x: options.c.x,
+                            y: options.c.y,
+                            w: options.c.w,
+                            h: options.c.h,
+                        },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }).success(function (data) {
+                        if (data.success) {
+                            options.url = data.result.path;
+                        } else {
+                            if (ctrl.formValidation) {
+                                ctrl.formValidation[$scope.controlName].$setValidity('crop-fail', false);
+                            }
+                        }
+                    }).error(function () {
+                        if (ctrl.formValidation) {
+                            ctrl.formValidation[$scope.controlName].$setValidity('crop-fail', false);
+                        }
+                    }).finally(function () {
+                        if (ctrl.formValidation) {
+                            ctrl.formValidation[$scope.controlName].$setValidity('cropping-image', true);
+                        }
+                    });
+                } else {
+                    if (ctrl.formValidation) {
+                        ctrl.formValidation[$scope.controlName].$setValidity('crop-fail', false);
+                    }
+                }
+            };
+
+            $scope.$watch('ctrl.ngModel[controlName]', function (newValue, oldValue) {
+                if (newValue) {
+                    $crop.attr('src', 'http://image.local.handpick.us/uploadfiles/' + newValue);
+                    $cropPreview.attr('src', 'http://image.local.handpick.us/uploadfiles/' + newValue);
+
+                    $crop.Jcrop({
+                        boxWidth: 400,
+                        onChange: updatePreview,
+                        onSelect: updatePreview,
+                        aspectRatio: xsize / ysize
+                    }, function () {
+                        // Use the API to get the real image size
+                        var bounds = this.getBounds();
+                        boundx = bounds[0];
+                        boundy = bounds[1];
+                        // Store the API in the jcrop_api variable
+                        jcrop_api = this;
+
+                        if (options.c && options.c.w > 0) {
+                            jcrop_api.animateTo([options.c.x, options.c.y, options.c.x + options.c.w, options.c.y + options.c.h]);
+                        }
+
+                        // Move the preview into the jcrop container for css positioning
+                        $preview.appendTo(jcrop_api.ui.holder);
+                    });
+
+                    function updatePreview(c) {
+                        if (parseInt(c.w) > 0) {
+                            options.c.x = c.x;
+                            options.c.y = c.y;
+                            options.c.w = c.w;
+                            options.c.h = c.h;
+                            options.c.x2 = c.x2;
+                            options.c.y2 = c.y2;
+
+                            var rx = xsize / c.w,
+                                ry = ysize / c.h;
+
+                            $pimg.css({
+                                width: Math.round(rx * boundx) + 'px',
+                                height: Math.round(ry * boundy) + 'px',
+                                marginLeft: '-' + Math.round(rx * c.x) + 'px',
+                                marginTop: '-' + Math.round(ry * c.y) + 'px'
+                            });
+                        }
+                    };
+                }
+            });
+
+            $element.on('change.bs.fileinput', function (e, file) {
+                e.stopPropagation();
+
+                var allowTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+                if (!file || allowTypes.indexOf(file.type) == -1) {
+                    if (!ctrl.formValidation ||
+                        !ctrl.formValidation[$scope.controlName].$error['uploading-file'] ||
+                        !ctrl.formValidation[$scope.controlName].$error['cropping-image']) {
+                        $element.fileinput('reset');
+                    }
+                    return;
+                }
+
+                if (ctrl.formValidation) {
+                    ctrl.formValidation.$setDirty();
+                    ctrl.formValidation[$scope.controlName].$setTouched();
+                    ctrl.formValidation[$scope.controlName].$setValidity('uploading-file', false);
+                }
+
+                var fd = new FormData();
+                fd.append('file', file);
+                $http.post('http://image.local.handpick.us/api/asset/uploadfile', fd, {
+                    withCredentials: false,
+                    headers: {
+                        'Content-Type': undefined
+                    },
+                    transformRequest: angular.identity,
+                    params: fd
+                }).success(function (data) {
+                    if (data.success) {
+                        jcrop_api && jcrop_api.destroy();
+                        $crop.removeAttr('style');
+                        options.c.w = 0;
+                        options.url = '';
+
+                        ctrl.ngModel[$scope.controlName] = data.result.path;
+                    } else {
+                        $element.fileinput('reset');
+                    }
+                }).error(function () {
+                    $element.fileinput('reset');
+                }).finally(function () {
+                    if (ctrl.formValidation) {
+                        ctrl.formValidation[$scope.controlName].$setValidity('uploading-file', true);
+                    }
+                });
+            });
+
+            $element.on('clear.bs.fileinput', function (e) {
+                jcrop_api.destroy();
+                $crop.removeAttr('style');
+                options.c.w = 0;
+                options.url = '';
+
+                ctrl.ngModel[$scope.controlName] = '';
+                if (ctrl.formValidation) {
+                    ctrl.formValidation.$setDirty();
+                    ctrl.formValidation[$scope.controlName].$setTouched();
+                }
+                $scope.$apply();
+            });
+        }
     };
 }]);
 
@@ -948,6 +1124,7 @@ angular.module('fwv/template/form/control.html', []).run(['$templateCache', func
         '       <form-date-picker ng-if=\"controlDatePicker\"></form-date-picker>\n' +
         '       <form-rich-text ng-if=\"controlRichText\"></form-rich-text>\n' +
         '       <form-file-upload ng-if=\"controlFileUpload\"></form-file-upload>\n' +
+        '       <form-file-upload-and-crop ng-if=\"controlFileUploadAndCrop\"></form-file-upload-and-crop>\n' +
         '       <span class=\"help-block\" ng-if=\"controlHelp.length > 0 || (ctrl.formValidation[controlName] | formShowMessage)\">\n' +
         '           {{(ctrl.formValidation[controlName] | formShowMessage) ? (ctrl.formValidation[controlName] | formErrorMessage) : controlHelp}}\n' +
         '       </span>\n' +
@@ -1188,6 +1365,31 @@ angular.module('fwv/template/form/file-upload.html', []).run(['$templateCache', 
 
 angular.module('fwv/template/form/file-upload-and-crop.html', []).run(['$templateCache', function ($templateCache) {
     $templateCache.put('fwv/template/form/file-upload-and-crop.html',
-        '<p class=\"form-control-static\"> {{ctrl.ngModel[controlName]}} </p>\n' +
+        '<div class=\"fileinput\" ng-class=\"ctrl.ngModel[controlName].length > 0 ? \'fileinput-exists\' : \'fileinput-new\'\" data-provides=\"fileinput\">\n' +
+        '   <div class=\"input-group input-large\">\n' +
+        '       <span class=\"input-group-addon btn default btn-file\">\n' +
+        '           <span class=\"fileinput-new\"> Select Image </span>\n' +
+        '           <span class=\"fileinput-exists\"> Change </span>\n' +
+        '           <input type=\"file\" name=\"{{controlName}}\" ng-model=\"ctrl.ngModel[controlName]\" ng-required=\"controlRequired\">\n' +
+        '       </span>\n' +
+        '       <a href=\"javascript:;\" class=\"input-group-addon btn btn-default fileinput-exists\" ng-click=\"crop()\"> Crop </a>\n' +
+        '       <a href=\"javascript:;\" class=\"input-group-addon btn btn-danger fileinput-exists\" data-dismiss=\"fileinput\"> Remove </a>\n' +
+        '   </div>\n' +
+        '   <div class=\"fileinput-preview fileinput-exists thumbnail hidden\"></div>\n' +
+        '   <div class=\"fileinput-exists clearfix margin-top-10\">\n' +
+        '       <div class=\"row\">\n' +
+        '           <div class=\"col-md-6\">\n' +
+        '               <img id=\"ProfilePictureResize\" src=\"\" />\n' +
+        '           </div>\n' +
+        '           <div class=\"col-md-6\">\n' +
+        '               <div id=\"preview-pane\">\n' +
+        '                   <div class=\"preview-container\" style=\"width: {{controlJcropOptions.p.w}}px; height: {{controlJcropOptions.p.h}}px;\">\n' +
+        '                       <img class=\"jcrop-preview\" src=\"\" />\n' +
+        '                   </div>\n' +
+        '               </div>\n' +
+        '           </div>\n' +
+        '       </div>\n' +
+        '   </div>\n' +
+        '</div>\n' +
         '');
 }]);
